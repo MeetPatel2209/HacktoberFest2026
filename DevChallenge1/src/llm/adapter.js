@@ -7,13 +7,21 @@
 // Ollama now; a WebLLM implementation can later return the same { complete } shape.
 
 export const OLLAMA_URL = 'http://localhost:11434';
-// Comparing llama3.1:8b vs qwen3:8b (think: false) on the manual test cases; winner becomes the default.
-export const DEFAULT_MODEL = 'llama3.1:8b';
+// Chosen over llama3.1:8b on the manual test cases (prompt-lab/results/): concrete tasks, no loops.
+export const DEFAULT_MODEL = 'qwen3:8b';
 export const DEFAULT_TIMEOUT_MS = 120_000; // generous; on the friend's RTX 4060 a call should take seconds
 // Context window (prompt + answer). Ollama's default 4096 is too tight for a 3-goal plan.
 export const DEFAULT_NUM_CTX = 8192;
 // Cap on answer length. Real plans are ~1000 tokens; a model stuck repeating itself is cut off here.
 export const DEFAULT_MAX_TOKENS = 3000;
+
+// Per-family defaults, matched by model-name prefix. Qwen3 "thinks out loud" by default,
+// which is slow and not needed with a schema, so thinking is switched off.
+const MODEL_DEFAULTS = [{ prefix: 'qwen3', think: false }];
+
+export function defaultThink(model) {
+  return MODEL_DEFAULTS.find((d) => model.startsWith(d.prefix))?.think;
+}
 
 export class LLMError extends Error {
   // kind: "unreachable" | "model-missing" | "timeout" | "http" | "bad-output"
@@ -31,8 +39,8 @@ export function createOllamaAdapter({
   timeoutMs = DEFAULT_TIMEOUT_MS,
   numCtx = DEFAULT_NUM_CTX,
   maxTokens = DEFAULT_MAX_TOKENS,
-  // true/false for thinking models (qwen3: pass false); leave undefined for models without it.
-  think,
+  // true/false for thinking models; defaults per model family (qwen3: false). undefined = not sent.
+  think = defaultThink(model),
   fetch = globalThis.fetch,
 } = {}) {
   async function complete(messages, schema) {
@@ -78,7 +86,7 @@ export function createOllamaAdapter({
     }
   }
 
-  return { complete, status, model };
+  return { complete, status, model, think };
 }
 
 async function request(fetch, url, timeoutMs, init) {

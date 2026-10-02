@@ -29,8 +29,8 @@ if (!model) {
   console.error('usage: node prompt-lab/run-cases.mjs <model> [case numbers...]');
   process.exit(1);
 }
-const think = model.startsWith('qwen3') ? false : undefined;
-const base = createOllamaAdapter({ model, think, timeoutMs: 300_000 });
+const base = createOllamaAdapter({ model, timeoutMs: 300_000 });
+const { think } = base;
 const outDir = join(dirname(fileURLToPath(import.meta.url)), 'results', model.replace(/[^a-z0-9.]+/gi, '-'));
 mkdirSync(outDir, { recursive: true });
 

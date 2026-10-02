@@ -27,12 +27,23 @@ describe('ollama adapter: complete', () => {
     });
   });
 
-  it('sends think only when set', async () => {
+  it('uses qwen3:8b with thinking off by default', async () => {
     const fetch = vi.fn(async () => chatReply('{}'));
-    await createOllamaAdapter({ fetch, think: false }).complete(messages, schema);
-    await createOllamaAdapter({ fetch }).complete(messages, schema);
-    expect(JSON.parse(fetch.mock.calls[0][1].body).think).toBe(false);
-    expect('think' in JSON.parse(fetch.mock.calls[1][1].body)).toBe(false);
+    const llm = createOllamaAdapter({ fetch });
+    await llm.complete(messages, schema);
+    const body = JSON.parse(fetch.mock.calls[0][1].body);
+    expect(body.model).toBe('qwen3:8b');
+    expect(body.think).toBe(false);
+    expect(llm.think).toBe(false);
+  });
+
+  it('sends think only for models that have a default or when set explicitly', async () => {
+    const fetch = vi.fn(async () => chatReply('{}'));
+    await createOllamaAdapter({ fetch, model: 'llama3.1:8b' }).complete(messages, schema);
+    await createOllamaAdapter({ fetch, model: 'llama3.1:8b', think: false }).complete(messages, schema);
+    await createOllamaAdapter({ fetch, model: 'qwen3:14b', think: true }).complete(messages, schema);
+    const sent = fetch.mock.calls.map(([, init]) => JSON.parse(init.body).think);
+    expect(sent).toEqual([undefined, false, true]);
   });
 
   it('uses a custom base URL', async () => {
