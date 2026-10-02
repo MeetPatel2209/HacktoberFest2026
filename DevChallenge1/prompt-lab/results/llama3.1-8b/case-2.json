@@ -1,5 +1,5 @@
 {
-  "model": "qwen3:8b",
+  "model": "llama3.1:8b",
   "case": {
     "name": "Three goals, different deadlines",
     "brainDump": "thesis chapter 3 due next Friday, resume to Priya by Monday, and renew my passport sometime this month",
@@ -11,16 +11,21 @@
   },
   "today": "2026-10-02",
   "maxMinutes": 25,
-  "totalSeconds": 23,
+  "totalSeconds": 113.5,
   "calls": [
     {
       "kind": "plan",
-      "seconds": 21.2,
+      "seconds": 85,
+      "error": "bad-output Answer was cut off after 3000 tokens; the model was probably repeating itself"
+    },
+    {
+      "kind": "plan",
+      "seconds": 28.5,
       "output": {
         "goals": [
           {
             "id": "g1",
-            "title": "Thesis chapter 3",
+            "title": "Thesis Chapter 3",
             "deadlineText": "due next Friday",
             "deadline": "2026-10-09",
             "estimatedMinutes": 240
@@ -30,14 +35,14 @@
             "title": "Resume to Priya",
             "deadlineText": "by Monday",
             "deadline": "2026-10-05",
-            "estimatedMinutes": 30
+            "estimatedMinutes": 60
           },
           {
             "id": "g3",
-            "title": "Renew my passport",
+            "title": "Renew Passport",
             "deadlineText": "sometime this month",
-            "deadline": "2026-10-31",
-            "estimatedMinutes": 60
+            "deadline": null,
+            "estimatedMinutes": 120
           }
         ],
         "tasks": [
@@ -45,15 +50,15 @@
             "id": "t1",
             "goalId": "g1",
             "isFirstStep": true,
-            "title": "Open the thesis chapter 3 document and write the introduction",
-            "minutes": 25,
+            "title": "Open the thesis document and review the chapter 3 outline",
+            "minutes": 5,
             "dependsOn": []
           },
           {
             "id": "t2",
             "goalId": "g1",
             "isFirstStep": false,
-            "title": "List 3 main points for the thesis chapter 3",
+            "title": "Write the introduction to chapter 3",
             "minutes": 25,
             "dependsOn": [
               "t1"
@@ -63,7 +68,7 @@
             "id": "t3",
             "goalId": "g1",
             "isFirstStep": false,
-            "title": "Write 300 words for the first main point",
+            "title": "Write the first section of chapter 3",
             "minutes": 25,
             "dependsOn": [
               "t2"
@@ -73,7 +78,7 @@
             "id": "t4",
             "goalId": "g1",
             "isFirstStep": false,
-            "title": "Write 300 words for the second main point",
+            "title": "Write the second section of chapter 3",
             "minutes": 25,
             "dependsOn": [
               "t3"
@@ -83,7 +88,7 @@
             "id": "t5",
             "goalId": "g1",
             "isFirstStep": false,
-            "title": "Write 300 words for the third main point",
+            "title": "Write the conclusion to chapter 3",
             "minutes": 25,
             "dependsOn": [
               "t4"
@@ -93,7 +98,7 @@
             "id": "t6",
             "goalId": "g1",
             "isFirstStep": false,
-            "title": "Write the conclusion for the thesis chapter 3, about 200 words",
+            "title": "Add references to chapter 3",
             "minutes": 25,
             "dependsOn": [
               "t5"
@@ -103,7 +108,7 @@
             "id": "t7",
             "goalId": "g1",
             "isFirstStep": false,
-            "title": "Check the thesis chapter 3 for grammar and clarity",
+            "title": "Read chapter 3 and make final revisions",
             "minutes": 25,
             "dependsOn": [
               "t6"
@@ -113,8 +118,8 @@
             "id": "t8",
             "goalId": "g1",
             "isFirstStep": false,
-            "title": "Save the thesis chapter 3 document and email it to the supervisor",
-            "minutes": 25,
+            "title": "Upload chapter 3 to the thesis portal",
+            "minutes": 5,
             "dependsOn": [
               "t7"
             ]
@@ -123,15 +128,15 @@
             "id": "t9",
             "goalId": "g2",
             "isFirstStep": true,
-            "title": "Open the resume document and make sure it's updated",
-            "minutes": 25,
+            "title": "Open the resume document and review the content",
+            "minutes": 5,
             "dependsOn": []
           },
           {
             "id": "t10",
             "goalId": "g2",
             "isFirstStep": false,
-            "title": "Email the resume to Priya with a subject line and a short message",
+            "title": "Update the resume with new skills and experience",
             "minutes": 25,
             "dependsOn": [
               "t9"
@@ -139,18 +144,20 @@
           },
           {
             "id": "t11",
-            "goalId": "g3",
-            "isFirstStep": true,
-            "title": "Find the passport renewal form online and print it",
+            "goalId": "g2",
+            "isFirstStep": false,
+            "title": "Proofread the resume for grammar and spelling errors",
             "minutes": 25,
-            "dependsOn": []
+            "dependsOn": [
+              "t10"
+            ]
           },
           {
             "id": "t12",
-            "goalId": "g3",
+            "goalId": "g2",
             "isFirstStep": false,
-            "title": "Fill out the passport renewal form with all the required details",
-            "minutes": 25,
+            "title": "Email the resume to Priya",
+            "minutes": 5,
             "dependsOn": [
               "t11"
             ]
@@ -158,48 +165,32 @@
           {
             "id": "t13",
             "goalId": "g3",
-            "isFirstStep": false,
-            "title": "Take the passport renewal form to the local office and schedule an appointment",
-            "minutes": 25,
-            "dependsOn": [
-              "t12"
-            ]
+            "isFirstStep": true,
+            "title": "Check the passport application status online",
+            "minutes": 5,
+            "dependsOn": []
           },
           {
             "id": "t14",
             "goalId": "g3",
             "isFirstStep": false,
-            "title": "Pay the passport renewal fee and keep the receipt",
+            "title": "Fill out the passport renewal form",
             "minutes": 25,
             "dependsOn": [
               "t13"
             ]
+          },
+          {
+            "id": "t15",
+            "goalId": "g3",
+            "isFirstStep": false,
+            "title": "Submit the passport renewal application",
+            "minutes": 25,
+            "dependsOn": [
+              "t14"
+            ]
           }
         ]
-      }
-    },
-    {
-      "kind": "first-step",
-      "seconds": 0.7,
-      "output": {
-        "title": "Open the thesis chapter 3 document",
-        "minutes": 5
-      }
-    },
-    {
-      "kind": "first-step",
-      "seconds": 0.5,
-      "output": {
-        "title": "Open the resume document and check the contact information",
-        "minutes": 5
-      }
-    },
-    {
-      "kind": "first-step",
-      "seconds": 0.6,
-      "output": {
-        "title": "Open the passport agency website and search for renewal form",
-        "minutes": 5
       }
     }
   ],
@@ -207,7 +198,7 @@
     "goals": [
       {
         "id": "g1",
-        "title": "Thesis chapter 3",
+        "title": "Thesis Chapter 3",
         "deadline": "2026-10-09",
         "deadlineText": "due next Friday",
         "estimatedMinutes": 240
@@ -217,39 +208,29 @@
         "title": "Resume to Priya",
         "deadline": "2026-10-05",
         "deadlineText": "by Monday",
-        "estimatedMinutes": 30
+        "estimatedMinutes": 60
       },
       {
         "id": "g3",
-        "title": "Renew my passport",
-        "deadline": "2026-10-31",
+        "title": "Renew Passport",
+        "deadline": null,
         "deadlineText": "sometime this month",
-        "estimatedMinutes": 60
+        "estimatedMinutes": 120
       }
     ],
     "tasks": [
       {
-        "id": "t1.0",
+        "id": "t1",
         "goalId": "g1",
-        "title": "Open the thesis chapter 3 document",
+        "title": "Open the thesis document and review the chapter 3 outline",
         "minutes": 5,
         "dependsOn": [],
         "isFirstStep": true
       },
       {
-        "id": "t1",
-        "goalId": "g1",
-        "title": "Open the thesis chapter 3 document and write the introduction",
-        "minutes": 25,
-        "dependsOn": [
-          "t1.0"
-        ],
-        "isFirstStep": false
-      },
-      {
         "id": "t2",
         "goalId": "g1",
-        "title": "List 3 main points for the thesis chapter 3",
+        "title": "Write the introduction to chapter 3",
         "minutes": 25,
         "dependsOn": [
           "t1"
@@ -259,7 +240,7 @@
       {
         "id": "t3",
         "goalId": "g1",
-        "title": "Write 300 words for the first main point",
+        "title": "Write the first section of chapter 3",
         "minutes": 25,
         "dependsOn": [
           "t2"
@@ -269,7 +250,7 @@
       {
         "id": "t4",
         "goalId": "g1",
-        "title": "Write 300 words for the second main point",
+        "title": "Write the second section of chapter 3",
         "minutes": 25,
         "dependsOn": [
           "t3"
@@ -279,7 +260,7 @@
       {
         "id": "t5",
         "goalId": "g1",
-        "title": "Write 300 words for the third main point",
+        "title": "Write the conclusion to chapter 3",
         "minutes": 25,
         "dependsOn": [
           "t4"
@@ -289,7 +270,7 @@
       {
         "id": "t6",
         "goalId": "g1",
-        "title": "Write the conclusion for the thesis chapter 3, about 200 words",
+        "title": "Add references to chapter 3",
         "minutes": 25,
         "dependsOn": [
           "t5"
@@ -299,7 +280,7 @@
       {
         "id": "t7",
         "goalId": "g1",
-        "title": "Check the thesis chapter 3 for grammar and clarity",
+        "title": "Read chapter 3 and make final revisions",
         "minutes": 25,
         "dependsOn": [
           "t6"
@@ -309,35 +290,25 @@
       {
         "id": "t8",
         "goalId": "g1",
-        "title": "Save the thesis chapter 3 document and email it to the supervisor",
-        "minutes": 25,
+        "title": "Upload chapter 3 to the thesis portal",
+        "minutes": 5,
         "dependsOn": [
           "t7"
         ],
         "isFirstStep": false
       },
       {
-        "id": "t9.0",
+        "id": "t9",
         "goalId": "g2",
-        "title": "Open the resume document and check the contact information",
+        "title": "Open the resume document and review the content",
         "minutes": 5,
         "dependsOn": [],
         "isFirstStep": true
       },
       {
-        "id": "t9",
-        "goalId": "g2",
-        "title": "Open the resume document and make sure it's updated",
-        "minutes": 25,
-        "dependsOn": [
-          "t9.0"
-        ],
-        "isFirstStep": false
-      },
-      {
         "id": "t10",
         "goalId": "g2",
-        "title": "Email the resume to Priya with a subject line and a short message",
+        "title": "Update the resume with new skills and experience",
         "minutes": 25,
         "dependsOn": [
           "t9"
@@ -345,28 +316,20 @@
         "isFirstStep": false
       },
       {
-        "id": "t11.0",
-        "goalId": "g3",
-        "title": "Open the passport agency website and search for renewal form",
-        "minutes": 5,
-        "dependsOn": [],
-        "isFirstStep": true
-      },
-      {
         "id": "t11",
-        "goalId": "g3",
-        "title": "Find the passport renewal form online and print it",
+        "goalId": "g2",
+        "title": "Proofread the resume for grammar and spelling errors",
         "minutes": 25,
         "dependsOn": [
-          "t11.0"
+          "t10"
         ],
         "isFirstStep": false
       },
       {
         "id": "t12",
-        "goalId": "g3",
-        "title": "Fill out the passport renewal form with all the required details",
-        "minutes": 25,
+        "goalId": "g2",
+        "title": "Email the resume to Priya",
+        "minutes": 5,
         "dependsOn": [
           "t11"
         ],
@@ -375,20 +338,28 @@
       {
         "id": "t13",
         "goalId": "g3",
-        "title": "Take the passport renewal form to the local office and schedule an appointment",
-        "minutes": 25,
-        "dependsOn": [
-          "t12"
-        ],
-        "isFirstStep": false
+        "title": "Check the passport application status online",
+        "minutes": 5,
+        "dependsOn": [],
+        "isFirstStep": true
       },
       {
         "id": "t14",
         "goalId": "g3",
-        "title": "Pay the passport renewal fee and keep the receipt",
+        "title": "Fill out the passport renewal form",
         "minutes": 25,
         "dependsOn": [
           "t13"
+        ],
+        "isFirstStep": false
+      },
+      {
+        "id": "t15",
+        "goalId": "g3",
+        "title": "Submit the passport renewal application",
+        "minutes": 25,
+        "dependsOn": [
+          "t14"
         ],
         "isFirstStep": false
       }

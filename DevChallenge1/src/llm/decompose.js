@@ -25,6 +25,7 @@ export async function decompose(llm, { brainDump, maxMinutes, today }) {
 
   return validatePlan(requestPlan, {
     maxMinutes,
+    brainDump,
     splitTask: async (task, max, goal) => (await llm.complete(splitMessages(task, max, goal), SPLIT_SCHEMA)).steps,
     shrinkFirstStep: (task, _max, goal) => llm.complete(firstStepMessages(task, goal), FIRST_STEP_SCHEMA),
     toEnglish: async (items) => (await llm.complete(englishMessages(items), ENGLISH_SCHEMA)).titles,

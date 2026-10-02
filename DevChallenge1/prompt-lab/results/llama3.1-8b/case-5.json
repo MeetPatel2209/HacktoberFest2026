@@ -1,0 +1,243 @@
+{
+  "model": "llama3.1:8b",
+  "case": {
+    "name": "Hinglish input (output must be English)",
+    "brainDump": "kal tak electricity bill pay karna hai, aur weekend pe gym ka routine start karna hai, plus mummy ke liye doctor appointment book karni hai",
+    "expectDeadlines": [
+      "2026-10-03",
+      "2026-10-04",
+      null
+    ]
+  },
+  "today": "2026-10-02",
+  "maxMinutes": 25,
+  "totalSeconds": 16.8,
+  "calls": [
+    {
+      "kind": "plan",
+      "seconds": 16.8,
+      "output": {
+        "goals": [
+          {
+            "id": "g1",
+            "title": "Pay electricity bill",
+            "deadlineText": "kal tak",
+            "deadline": "2026-10-03",
+            "estimatedMinutes": 30
+          },
+          {
+            "id": "g2",
+            "title": "Start gym routine",
+            "deadlineText": "weekend pe",
+            "deadline": "2026-10-03",
+            "estimatedMinutes": 60
+          },
+          {
+            "id": "g3",
+            "title": "Book doctor appointment for mom",
+            "deadlineText": null,
+            "deadline": null,
+            "estimatedMinutes": 30
+          }
+        ],
+        "tasks": [
+          {
+            "id": "t1",
+            "goalId": "g1",
+            "isFirstStep": true,
+            "title": "Open electricity bill payment website",
+            "minutes": 5,
+            "dependsOn": []
+          },
+          {
+            "id": "t2",
+            "goalId": "g1",
+            "isFirstStep": false,
+            "title": "Enter electricity bill payment details",
+            "minutes": 20,
+            "dependsOn": [
+              "t1"
+            ]
+          },
+          {
+            "id": "t3",
+            "goalId": "g1",
+            "isFirstStep": false,
+            "title": "Confirm electricity bill payment",
+            "minutes": 5,
+            "dependsOn": [
+              "t2"
+            ]
+          },
+          {
+            "id": "t4",
+            "goalId": "g2",
+            "isFirstStep": true,
+            "title": "Plan gym routine for weekend",
+            "minutes": 10,
+            "dependsOn": []
+          },
+          {
+            "id": "t5",
+            "goalId": "g2",
+            "isFirstStep": false,
+            "title": "Choose gym equipment to use",
+            "minutes": 15,
+            "dependsOn": [
+              "t4"
+            ]
+          },
+          {
+            "id": "t6",
+            "goalId": "g2",
+            "isFirstStep": false,
+            "title": "Warm up and start gym routine",
+            "minutes": 20,
+            "dependsOn": [
+              "t5"
+            ]
+          },
+          {
+            "id": "t7",
+            "goalId": "g3",
+            "isFirstStep": true,
+            "title": "Call doctor's office to book appointment",
+            "minutes": 10,
+            "dependsOn": []
+          },
+          {
+            "id": "t8",
+            "goalId": "g3",
+            "isFirstStep": false,
+            "title": "Provide appointment details for mom",
+            "minutes": 15,
+            "dependsOn": [
+              "t7"
+            ]
+          },
+          {
+            "id": "t9",
+            "goalId": "g3",
+            "isFirstStep": false,
+            "title": "Confirm appointment with doctor's office",
+            "minutes": 5,
+            "dependsOn": [
+              "t8"
+            ]
+          }
+        ]
+      }
+    }
+  ],
+  "plan": {
+    "goals": [
+      {
+        "id": "g1",
+        "title": "Pay electricity bill",
+        "deadline": "2026-10-03",
+        "deadlineText": "kal tak",
+        "estimatedMinutes": 30
+      },
+      {
+        "id": "g2",
+        "title": "Start gym routine",
+        "deadline": "2026-10-03",
+        "deadlineText": "weekend pe",
+        "estimatedMinutes": 60
+      },
+      {
+        "id": "g3",
+        "title": "Book doctor appointment for mom",
+        "deadline": null,
+        "deadlineText": null,
+        "estimatedMinutes": 30
+      }
+    ],
+    "tasks": [
+      {
+        "id": "t1",
+        "goalId": "g1",
+        "title": "Open electricity bill payment website",
+        "minutes": 5,
+        "dependsOn": [],
+        "isFirstStep": true
+      },
+      {
+        "id": "t2",
+        "goalId": "g1",
+        "title": "Enter electricity bill payment details",
+        "minutes": 20,
+        "dependsOn": [
+          "t1"
+        ],
+        "isFirstStep": false
+      },
+      {
+        "id": "t3",
+        "goalId": "g1",
+        "title": "Confirm electricity bill payment",
+        "minutes": 5,
+        "dependsOn": [
+          "t2"
+        ],
+        "isFirstStep": false
+      },
+      {
+        "id": "t4",
+        "goalId": "g2",
+        "title": "Plan gym routine for weekend",
+        "minutes": 10,
+        "dependsOn": [],
+        "isFirstStep": true
+      },
+      {
+        "id": "t5",
+        "goalId": "g2",
+        "title": "Choose gym equipment to use",
+        "minutes": 15,
+        "dependsOn": [
+          "t4"
+        ],
+        "isFirstStep": false
+      },
+      {
+        "id": "t6",
+        "goalId": "g2",
+        "title": "Warm up and start gym routine",
+        "minutes": 20,
+        "dependsOn": [
+          "t5"
+        ],
+        "isFirstStep": false
+      },
+      {
+        "id": "t7",
+        "goalId": "g3",
+        "title": "Call doctor's office to book appointment",
+        "minutes": 10,
+        "dependsOn": [],
+        "isFirstStep": true
+      },
+      {
+        "id": "t8",
+        "goalId": "g3",
+        "title": "Provide appointment details for mom",
+        "minutes": 15,
+        "dependsOn": [
+          "t7"
+        ],
+        "isFirstStep": false
+      },
+      {
+        "id": "t9",
+        "goalId": "g3",
+        "title": "Confirm appointment with doctor's office",
+        "minutes": 5,
+        "dependsOn": [
+          "t8"
+        ],
+        "isFirstStep": false
+      }
+    ]
+  }
+}

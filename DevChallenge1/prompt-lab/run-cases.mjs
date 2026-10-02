@@ -78,7 +78,10 @@ for (const n of numbers) {
   }
 
   for (const g of plan.goals) {
-    console.log(`\n   ${g.id} ${g.title}  [deadline: ${g.deadline ?? 'none'}]`);
+    const taskMinutes = plan.tasks.filter((t) => t.goalId === g.id).reduce((sum, t) => sum + t.minutes, 0);
+    const quote = g.deadlineText ? ` from "${g.deadlineText}"` : '';
+    const size = g.estimatedMinutes ? `  [estimate ${g.estimatedMinutes}m, tasks ${taskMinutes}m${taskMinutes < g.estimatedMinutes / 2 ? ' ⚠ under half' : ''}]` : '';
+    console.log(`\n   ${g.id} ${g.title}  [deadline: ${g.deadline ?? 'none'}${quote}]${size}`);
     for (const t of plan.tasks.filter((t) => t.goalId === g.id)) {
       const flags = [VAGUE.test(t.title) && 'vague?', looksNonEnglish(t.title) && 'not English'].filter(Boolean);
       const deps = t.dependsOn.length ? ` ← ${t.dependsOn.join(', ')}` : '';

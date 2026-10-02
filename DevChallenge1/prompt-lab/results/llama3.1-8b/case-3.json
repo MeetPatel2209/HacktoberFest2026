@@ -1,5 +1,5 @@
 {
-  "model": "qwen3:8b",
+  "model": "llama3.1:8b",
   "case": {
     "name": "Loose availability (must be ignored)",
     "brainDump": "weekday evenings work but not Wednesday. need to clean my room and finish the DSA assignment by Tuesday",
@@ -10,11 +10,11 @@
   },
   "today": "2026-10-02",
   "maxMinutes": 25,
-  "totalSeconds": 17.2,
+  "totalSeconds": 24.9,
   "calls": [
     {
       "kind": "plan",
-      "seconds": 17.2,
+      "seconds": 24.9,
       "output": {
         "goals": [
           {
@@ -22,14 +22,14 @@
             "title": "Clean my room",
             "deadlineText": null,
             "deadline": null,
-            "estimatedMinutes": 30
+            "estimatedMinutes": 120
           },
           {
             "id": "g2",
-            "title": "Finish the DSA assignment",
+            "title": "Finish DSA assignment",
             "deadlineText": "by Tuesday",
             "deadline": "2026-10-06",
-            "estimatedMinutes": 60
+            "estimatedMinutes": 240
           }
         ],
         "tasks": [
@@ -37,7 +37,7 @@
             "id": "t1",
             "goalId": "g1",
             "isFirstStep": true,
-            "title": "Put all clothes into the laundry basket",
+            "title": "Put on some music and start picking up clothes",
             "minutes": 5,
             "dependsOn": []
           },
@@ -45,8 +45,8 @@
             "id": "t2",
             "goalId": "g1",
             "isFirstStep": false,
-            "title": "Take all books and stack them on the shelf",
-            "minutes": 5,
+            "title": "Sort clothes into three piles: keep, donate, throw away",
+            "minutes": 25,
             "dependsOn": [
               "t1"
             ]
@@ -55,8 +55,8 @@
             "id": "t3",
             "goalId": "g1",
             "isFirstStep": false,
-            "title": "Put all papers into the recycling bin",
-            "minutes": 5,
+            "title": "Put away clothes that are still in good condition",
+            "minutes": 25,
             "dependsOn": [
               "t2"
             ]
@@ -65,55 +65,55 @@
             "id": "t4",
             "goalId": "g1",
             "isFirstStep": false,
-            "title": "Wipe the desk and keyboard with a disinfectant wipe",
-            "minutes": 5,
+            "title": "Throw away clothes that are torn or no longer useful",
+            "minutes": 25,
             "dependsOn": [
-              "t3"
+              "t2"
             ]
           },
           {
             "id": "t5",
             "goalId": "g1",
             "isFirstStep": false,
-            "title": "Throw away any trash in the room",
-            "minutes": 5,
+            "title": "Donate clothes that are still in good condition",
+            "minutes": 25,
             "dependsOn": [
-              "t4"
+              "t2"
             ]
           },
           {
             "id": "t6",
             "goalId": "g1",
             "isFirstStep": false,
-            "title": "Organize the desk drawer and put everything in order",
-            "minutes": 5,
-            "dependsOn": [
-              "t5"
-            ]
+            "title": "Wipe down surfaces and dust furniture",
+            "minutes": 25,
+            "dependsOn": []
           },
           {
             "id": "t7",
             "goalId": "g1",
             "isFirstStep": false,
-            "title": "Make the bed and put the blanket on the bed",
-            "minutes": 5,
+            "title": "Vacuum or sweep the floor",
+            "minutes": 25,
             "dependsOn": [
               "t6"
             ]
           },
           {
             "id": "t8",
-            "goalId": "g2",
-            "isFirstStep": true,
-            "title": "Open the DSA assignment document and read the instructions",
-            "minutes": 5,
-            "dependsOn": []
+            "goalId": "g1",
+            "isFirstStep": false,
+            "title": "Mop the floor",
+            "minutes": 25,
+            "dependsOn": [
+              "t7"
+            ]
           },
           {
             "id": "t9",
-            "goalId": "g2",
+            "goalId": "g1",
             "isFirstStep": false,
-            "title": "Write the first section of the assignment, about 250 words",
+            "title": "Write the next steps for cleaning my room",
             "minutes": 25,
             "dependsOn": [
               "t8"
@@ -122,18 +122,16 @@
           {
             "id": "t10",
             "goalId": "g2",
-            "isFirstStep": false,
-            "title": "Write the second section of the assignment, about 250 words",
-            "minutes": 25,
-            "dependsOn": [
-              "t9"
-            ]
+            "isFirstStep": true,
+            "title": "Open the DSA assignment document and read the instructions",
+            "minutes": 5,
+            "dependsOn": []
           },
           {
             "id": "t11",
             "goalId": "g2",
             "isFirstStep": false,
-            "title": "Write the third section of the assignment, about 250 words",
+            "title": "Start working on the DSA assignment",
             "minutes": 25,
             "dependsOn": [
               "t10"
@@ -143,7 +141,7 @@
             "id": "t12",
             "goalId": "g2",
             "isFirstStep": false,
-            "title": "Check the assignment for grammar and formatting errors",
+            "title": "Write the next steps for the DSA assignment",
             "minutes": 25,
             "dependsOn": [
               "t11"
@@ -153,10 +151,20 @@
             "id": "t13",
             "goalId": "g2",
             "isFirstStep": false,
-            "title": "Save the assignment and submit it by Tuesday",
-            "minutes": 5,
+            "title": "Read the next steps for the DSA assignment and start working on it",
+            "minutes": 25,
             "dependsOn": [
               "t12"
+            ]
+          },
+          {
+            "id": "t14",
+            "goalId": "g2",
+            "isFirstStep": false,
+            "title": "Finish the DSA assignment",
+            "minutes": 25,
+            "dependsOn": [
+              "t13"
             ]
           }
         ]
@@ -170,21 +178,21 @@
         "title": "Clean my room",
         "deadline": null,
         "deadlineText": null,
-        "estimatedMinutes": 30
+        "estimatedMinutes": 120
       },
       {
         "id": "g2",
-        "title": "Finish the DSA assignment",
+        "title": "Finish DSA assignment",
         "deadline": "2026-10-06",
         "deadlineText": "by Tuesday",
-        "estimatedMinutes": 60
+        "estimatedMinutes": 240
       }
     ],
     "tasks": [
       {
         "id": "t1",
         "goalId": "g1",
-        "title": "Put all clothes into the laundry basket",
+        "title": "Put on some music and start picking up clothes",
         "minutes": 5,
         "dependsOn": [],
         "isFirstStep": true
@@ -192,8 +200,8 @@
       {
         "id": "t2",
         "goalId": "g1",
-        "title": "Take all books and stack them on the shelf",
-        "minutes": 5,
+        "title": "Sort clothes into three piles: keep, donate, throw away",
+        "minutes": 25,
         "dependsOn": [
           "t1"
         ],
@@ -202,8 +210,8 @@
       {
         "id": "t3",
         "goalId": "g1",
-        "title": "Put all papers into the recycling bin",
-        "minutes": 5,
+        "title": "Put away clothes that are still in good condition",
+        "minutes": 25,
         "dependsOn": [
           "t2"
         ],
@@ -212,38 +220,36 @@
       {
         "id": "t4",
         "goalId": "g1",
-        "title": "Wipe the desk and keyboard with a disinfectant wipe",
-        "minutes": 5,
+        "title": "Throw away clothes that are torn or no longer useful",
+        "minutes": 25,
         "dependsOn": [
-          "t3"
+          "t2"
         ],
         "isFirstStep": false
       },
       {
         "id": "t5",
         "goalId": "g1",
-        "title": "Throw away any trash in the room",
-        "minutes": 5,
+        "title": "Donate clothes that are still in good condition",
+        "minutes": 25,
         "dependsOn": [
-          "t4"
+          "t2"
         ],
         "isFirstStep": false
       },
       {
         "id": "t6",
         "goalId": "g1",
-        "title": "Organize the desk drawer and put everything in order",
-        "minutes": 5,
-        "dependsOn": [
-          "t5"
-        ],
+        "title": "Wipe down surfaces and dust furniture",
+        "minutes": 25,
+        "dependsOn": [],
         "isFirstStep": false
       },
       {
         "id": "t7",
         "goalId": "g1",
-        "title": "Make the bed and put the blanket on the bed",
-        "minutes": 5,
+        "title": "Vacuum or sweep the floor",
+        "minutes": 25,
         "dependsOn": [
           "t6"
         ],
@@ -251,16 +257,18 @@
       },
       {
         "id": "t8",
-        "goalId": "g2",
-        "title": "Open the DSA assignment document and read the instructions",
-        "minutes": 5,
-        "dependsOn": [],
-        "isFirstStep": true
+        "goalId": "g1",
+        "title": "Mop the floor",
+        "minutes": 25,
+        "dependsOn": [
+          "t7"
+        ],
+        "isFirstStep": false
       },
       {
         "id": "t9",
-        "goalId": "g2",
-        "title": "Write the first section of the assignment, about 250 words",
+        "goalId": "g1",
+        "title": "Write the next steps for cleaning my room",
         "minutes": 25,
         "dependsOn": [
           "t8"
@@ -270,17 +278,15 @@
       {
         "id": "t10",
         "goalId": "g2",
-        "title": "Write the second section of the assignment, about 250 words",
-        "minutes": 25,
-        "dependsOn": [
-          "t9"
-        ],
-        "isFirstStep": false
+        "title": "Open the DSA assignment document and read the instructions",
+        "minutes": 5,
+        "dependsOn": [],
+        "isFirstStep": true
       },
       {
         "id": "t11",
         "goalId": "g2",
-        "title": "Write the third section of the assignment, about 250 words",
+        "title": "Start working on the DSA assignment",
         "minutes": 25,
         "dependsOn": [
           "t10"
@@ -290,7 +296,7 @@
       {
         "id": "t12",
         "goalId": "g2",
-        "title": "Check the assignment for grammar and formatting errors",
+        "title": "Write the next steps for the DSA assignment",
         "minutes": 25,
         "dependsOn": [
           "t11"
@@ -300,10 +306,20 @@
       {
         "id": "t13",
         "goalId": "g2",
-        "title": "Save the assignment and submit it by Tuesday",
-        "minutes": 5,
+        "title": "Read the next steps for the DSA assignment and start working on it",
+        "minutes": 25,
         "dependsOn": [
           "t12"
+        ],
+        "isFirstStep": false
+      },
+      {
+        "id": "t14",
+        "goalId": "g2",
+        "title": "Finish the DSA assignment",
+        "minutes": 25,
+        "dependsOn": [
+          "t13"
         ],
         "isFirstStep": false
       }

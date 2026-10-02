@@ -1,5 +1,5 @@
 {
-  "model": "qwen3:8b",
+  "model": "llama3.1:8b",
   "case": {
     "name": "Already broken down by the user",
     "brainDump": "Portfolio site: 1) pick a template 2) write about page 3) add 3 projects with screenshots 4) deploy to GitHub Pages",
@@ -9,11 +9,11 @@
   },
   "today": "2026-10-02",
   "maxMinutes": 25,
-  "totalSeconds": 6.9,
+  "totalSeconds": 10.3,
   "calls": [
     {
       "kind": "plan",
-      "seconds": 6.9,
+      "seconds": 10.3,
       "output": {
         "goals": [
           {
@@ -21,7 +21,7 @@
             "title": "Portfolio site",
             "deadlineText": null,
             "deadline": null,
-            "estimatedMinutes": 120
+            "estimatedMinutes": 240
           }
         ],
         "tasks": [
@@ -29,7 +29,7 @@
             "id": "t1",
             "goalId": "g1",
             "isFirstStep": true,
-            "title": "Open a portfolio website builder and pick a template",
+            "title": "Open a new browser tab and search for portfolio templates",
             "minutes": 5,
             "dependsOn": []
           },
@@ -37,7 +37,7 @@
             "id": "t2",
             "goalId": "g1",
             "isFirstStep": false,
-            "title": "Write a short bio and write about your skills on the About page",
+            "title": "Choose a portfolio template and download it",
             "minutes": 25,
             "dependsOn": [
               "t1"
@@ -47,7 +47,7 @@
             "id": "t3",
             "goalId": "g1",
             "isFirstStep": false,
-            "title": "Take screenshots of 3 projects and add them to the Projects page",
+            "title": "Write the about page content",
             "minutes": 25,
             "dependsOn": [
               "t2"
@@ -57,7 +57,7 @@
             "id": "t4",
             "goalId": "g1",
             "isFirstStep": false,
-            "title": "Write a brief description for each project and add it to the Projects page",
+            "title": "Add three projects with screenshots to the portfolio",
             "minutes": 25,
             "dependsOn": [
               "t3"
@@ -67,10 +67,20 @@
             "id": "t5",
             "goalId": "g1",
             "isFirstStep": false,
-            "title": "Deploy the portfolio site to GitHub Pages",
+            "title": "Deploy the portfolio to GitHub Pages",
             "minutes": 25,
             "dependsOn": [
               "t4"
+            ]
+          },
+          {
+            "id": "t6",
+            "goalId": "g1",
+            "isFirstStep": false,
+            "title": "Write the next steps for Portfolio site",
+            "minutes": 10,
+            "dependsOn": [
+              "t5"
             ]
           }
         ]
@@ -84,14 +94,14 @@
         "title": "Portfolio site",
         "deadline": null,
         "deadlineText": null,
-        "estimatedMinutes": 120
+        "estimatedMinutes": 240
       }
     ],
     "tasks": [
       {
         "id": "t1",
         "goalId": "g1",
-        "title": "Open a portfolio website builder and pick a template",
+        "title": "Open a new browser tab and search for portfolio templates",
         "minutes": 5,
         "dependsOn": [],
         "isFirstStep": true
@@ -99,7 +109,7 @@
       {
         "id": "t2",
         "goalId": "g1",
-        "title": "Write a short bio and write about your skills on the About page",
+        "title": "Choose a portfolio template and download it",
         "minutes": 25,
         "dependsOn": [
           "t1"
@@ -109,7 +119,7 @@
       {
         "id": "t3",
         "goalId": "g1",
-        "title": "Take screenshots of 3 projects and add them to the Projects page",
+        "title": "Write the about page content",
         "minutes": 25,
         "dependsOn": [
           "t2"
@@ -119,7 +129,7 @@
       {
         "id": "t4",
         "goalId": "g1",
-        "title": "Write a brief description for each project and add it to the Projects page",
+        "title": "Add three projects with screenshots to the portfolio",
         "minutes": 25,
         "dependsOn": [
           "t3"
@@ -129,10 +139,20 @@
       {
         "id": "t5",
         "goalId": "g1",
-        "title": "Deploy the portfolio site to GitHub Pages",
+        "title": "Deploy the portfolio to GitHub Pages",
         "minutes": 25,
         "dependsOn": [
           "t4"
+        ],
+        "isFirstStep": false
+      },
+      {
+        "id": "t6",
+        "goalId": "g1",
+        "title": "Write the next steps for Portfolio site",
+        "minutes": 10,
+        "dependsOn": [
+          "t5"
         ],
         "isFirstStep": false
       }

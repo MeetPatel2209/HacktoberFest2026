@@ -1,0 +1,26 @@
+{
+  "model": "llama3.1:8b",
+  "case": {
+    "name": "Huge vague goal",
+    "brainDump": "get my life together",
+    "expectDeadlines": [
+      null
+    ]
+  },
+  "today": "2026-10-02",
+  "maxMinutes": 25,
+  "totalSeconds": 173.2,
+  "calls": [
+    {
+      "kind": "plan",
+      "seconds": 88.3,
+      "error": "bad-output Answer was cut off after 3000 tokens; the model was probably repeating itself"
+    },
+    {
+      "kind": "plan",
+      "seconds": 84.8,
+      "error": "bad-output Answer was cut off after 3000 tokens; the model was probably repeating itself"
+    }
+  ],
+  "error": "PlanError: Couldn't turn that into a plan. Try again, or reword it a little."
+}

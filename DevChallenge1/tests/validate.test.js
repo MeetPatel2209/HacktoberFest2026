@@ -10,6 +10,7 @@ import {
   hardSplit,
   enforceEnglish,
   looksNonEnglish,
+  checkDeadlineEvidence,
   PlanError,
   FRIENDLY_ERROR,
 } from '../src/validate.js';
@@ -55,6 +56,45 @@ describe('checkShape', () => {
     const r = checkShape(input);
     expect(r.ok).toBe(false);
     expect(r.errors.join('\n')).toMatch(message);
+  });
+});
+
+describe('checkShape: goal evidence fields', () => {
+  it('keeps deadlineText and estimatedMinutes when present', () => {
+    const r = checkShape(plan([], [{ id: 'g1', title: 'x', deadlineText: 'by Monday', deadline: '2026-10-05', estimatedMinutes: 59.6 }]));
+    expect(r.plan.goals[0]).toEqual({ id: 'g1', title: 'x', deadline: '2026-10-05', deadlineText: 'by Monday', estimatedMinutes: 60 });
+  });
+
+  it('rejects a bad deadlineText or estimatedMinutes', () => {
+    expect(checkShape(plan([], [{ id: 'g1', title: 'x', deadline: null, deadlineText: 5 }])).ok).toBe(false);
+    expect(checkShape(plan([], [{ id: 'g1', title: 'x', deadline: null, estimatedMinutes: -1 }])).ok).toBe(false);
+  });
+});
+
+describe('checkDeadlineEvidence', () => {
+  const dump = 'Thesis due next Friday, resume to Priya by Monday. kal tak bill pay karna hai.';
+  const goal = (deadlineText, deadline = '2026-10-09') => ({ id: 'g1', title: 'x', deadlineText, deadline });
+
+  it('keeps a deadline whose quote is in the brain-dump (case and punctuation ignored)', () => {
+    expect(checkDeadlineEvidence([goal('due next friday')], dump)[0].deadline).toBe('2026-10-09');
+    expect(checkDeadlineEvidence([goal('"by Monday,"')], dump)[0].deadline).toBe('2026-10-09');
+    expect(checkDeadlineEvidence([goal('kal tak')], dump)[0].deadline).toBe('2026-10-09');
+  });
+
+  it('drops a deadline with no quote or a quote that is not in the text', () => {
+    expect(checkDeadlineEvidence([goal(null)], dump)[0].deadline).toBeNull();
+    expect(checkDeadlineEvidence([goal('')], dump)[0].deadline).toBeNull();
+    expect(checkDeadlineEvidence([goal('by the end of the month')], dump)[0].deadline).toBeNull();
+  });
+
+  it('matches whole words only', () => {
+    expect(checkDeadlineEvidence([goal('day')], 'by Monday')[0].deadline).toBeNull();
+  });
+
+  it('leaves goals alone when there is no deadlineText field or no brain-dump', () => {
+    const old = { id: 'g1', title: 'x', deadline: '2026-10-09' };
+    expect(checkDeadlineEvidence([old], dump)[0]).toBe(old);
+    expect(checkDeadlineEvidence([goal(null)], undefined)[0].deadline).toBe('2026-10-09');
   });
 });
 
@@ -202,6 +242,15 @@ describe('enforceFirstStep', () => {
       ['t1', 'do t1', 25, ['t1.0'], false], // original work kept
       ['t2', 'do t2', 25, ['t1'], false],
     ]);
+  });
+
+  it('rejects placeholder titles that echo the instructions and falls back to a split', async () => {
+    for (const title of ['Tiny Step ', 'First step', 'the next step 1', 'Small task.']) {
+      const r = await enforceFirstStep([task('t1', 25)], vi.fn().mockResolvedValue({ title, minutes: 5 }));
+      expect(r[0].title).toBe('do t1 (first 10 minutes)');
+    }
+    const ok = await enforceFirstStep([task('t1', 25)], vi.fn().mockResolvedValue({ title: 'Take the first step file out of the drawer', minutes: 5 }));
+    expect(ok[0].title).toBe('Take the first step file out of the drawer');
   });
 
   it('caps a model-written first step that is still too big at 10 min', async () => {

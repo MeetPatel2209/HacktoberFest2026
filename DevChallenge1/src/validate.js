@@ -3,13 +3,14 @@
 // No model access here: anything that needs to ask the model again is passed in as a function,
 // so this stays testable and the adapter stays the only thing that talks to the model.
 //
-// validatePlan(requestPlan, { maxMinutes, splitTask, shrinkFirstStep, toEnglish }) -> Promise<{ goals, tasks }>
+// validatePlan(requestPlan, { maxMinutes, brainDump, splitTask, shrinkFirstStep, toEnglish }) -> Promise<{ goals, tasks }>
 //   requestPlan(feedback | null)             -> raw Call 2 response (object or JSON string)
 //   splitTask(task, maxMinutes, goal)        -> [{ title, minutes }]  ("split this into steps of at most N minutes")
 //   shrinkFirstStep(task, maxMinutes, goal)  -> { title, minutes }    ("give a tiny step to do before this")
 //   toEnglish([{ id, title }])               -> [{ id, title }]       ("rewrite these in English")
 //
-// Order: shape (1), dependency cleanup (4), size cap (2), first step (3), English titles, minimum (5).
+// Order: shape (1), deadline evidence, dependency cleanup (4), size cap (2), first step (3),
+// English titles, minimum (5).
 // Dependency cleanup runs early because splitting rewires edges and first-step detection
 // reads dependsOn; both need clean edges.
 
@@ -27,9 +28,9 @@ export class PlanError extends Error {
 
 export const FRIENDLY_ERROR = "Couldn't turn that into a plan. Try again, or reword it a little.";
 
-export async function validatePlan(requestPlan, { maxMinutes, splitTask, shrinkFirstStep, toEnglish } = {}) {
+export async function validatePlan(requestPlan, { maxMinutes, brainDump, splitTask, shrinkFirstStep, toEnglish } = {}) {
   let plan = await parseWithRetry(requestPlan);
-  const { goals } = plan;
+  const goals = checkDeadlineEvidence(plan.goals, brainDump);
   plan = { goals, tasks: cleanDependencies(plan.tasks) };
   plan = { goals, tasks: await enforceSizeCap(plan.tasks, maxMinutes, splitTask, goals) };
   plan = { goals, tasks: await enforceFirstStep(plan.tasks, shrinkFirstStep, maxMinutes, goals) };
@@ -77,6 +78,12 @@ export function checkShape(raw) {
     if (g.deadline != null && !/^\d{4}-\d{2}-\d{2}(T\d{2}:\d{2}(:\d{2})?)?$/.test(g.deadline)) {
       errors.push(`goals[${i}].deadline must be YYYY-MM-DD or null`);
     }
+    if (g.deadlineText != null && typeof g.deadlineText !== 'string') {
+      errors.push(`goals[${i}].deadlineText must be a string or null`);
+    }
+    if (g.estimatedMinutes != null && !(Number.isFinite(g.estimatedMinutes) && g.estimatedMinutes > 0)) {
+      errors.push(`goals[${i}].estimatedMinutes must be a positive number`);
+    }
   });
 
   const taskIds = new Set();
@@ -99,7 +106,13 @@ export function checkShape(raw) {
   return {
     ok: true,
     plan: {
-      goals: data.goals.map((g) => ({ id: g.id, title: g.title, deadline: g.deadline ?? null })),
+      goals: data.goals.map((g) => ({
+        id: g.id,
+        title: g.title,
+        deadline: g.deadline ?? null,
+        ...('deadlineText' in g && { deadlineText: g.deadlineText ?? null }),
+        ...(g.estimatedMinutes != null && { estimatedMinutes: Math.round(g.estimatedMinutes) }),
+      })),
       tasks: data.tasks.map((t) => ({
         id: t.id,
         goalId: t.goalId,
@@ -110,6 +123,26 @@ export function checkShape(raw) {
       })),
     },
   };
+}
+
+// Deadlines need evidence: the model quotes the words that state each deadline (deadlineText).
+// If the quote is missing or isn't in the brain-dump, the deadline is dropped rather than guessed.
+// Goals from a response without deadlineText are left alone.
+export function checkDeadlineEvidence(goals, brainDump) {
+  if (brainDump == null) return goals;
+  const text = ` ${normalizeText(brainDump)} `;
+  return goals.map((g) => {
+    if (!('deadlineText' in g) || g.deadline == null) return g;
+    const quote = g.deadlineText ? normalizeText(g.deadlineText) : '';
+    return quote && text.includes(` ${quote} `) ? g : { ...g, deadline: null };
+  });
+}
+
+function normalizeText(s) {
+  return s
+    .toLowerCase()
+    .replace(/[^\p{L}\p{N}]+/gu, ' ')
+    .trim();
 }
 
 // 2. Tasks over maxMinutes go back to the model to split (max 2 rounds), then code splits equally.
@@ -228,7 +261,8 @@ async function tryShrink(shrinkFirstStep, task, maxMinutes, goal) {
   if (!shrinkFirstStep) return null;
   try {
     const s = await shrinkFirstStep(task, maxMinutes, goal);
-    const ok = isObject(s) && isNonEmptyString(s.title) && Number.isFinite(s.minutes) && s.minutes > 0;
+    const ok =
+      isObject(s) && isNonEmptyString(s.title) && !isPlaceholder(s.title) && Number.isFinite(s.minutes) && s.minutes > 0;
     return ok ? { title: s.title, minutes: Math.round(s.minutes) } : null;
   } catch {
     return null;
@@ -325,6 +359,11 @@ export function looksNonEnglish(text) {
 // 5. Every task is at least 5 minutes.
 export function clampMinimum(tasks) {
   return tasks.map((t) => ({ ...t, minutes: Math.max(MIN_MINUTES, t.minutes) }));
+}
+
+// Titles that echo the instructions instead of naming an action ("Tiny Step", "First step 1").
+function isPlaceholder(title) {
+  return /^(the |a |my )?(tiny |small |first |next |starting )*(step|task|action)s?( \d+)?[.!]?$/i.test(title.trim());
 }
 
 function freshId(id, taken) {

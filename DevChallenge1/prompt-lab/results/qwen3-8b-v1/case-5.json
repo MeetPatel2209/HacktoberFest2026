@@ -11,33 +11,27 @@
   },
   "today": "2026-10-02",
   "maxMinutes": 25,
-  "totalSeconds": 17.5,
+  "totalSeconds": 15.4,
   "calls": [
     {
       "kind": "plan",
-      "seconds": 15.3,
+      "seconds": 13.3,
       "output": {
         "goals": [
           {
             "id": "g1",
             "title": "Electricity bill pay karna hai",
-            "deadlineText": "kal tak",
-            "deadline": "2026-10-03",
-            "estimatedMinutes": 10
+            "deadline": "2026-10-02"
           },
           {
             "id": "g2",
             "title": "Weekend pe gym ka routine start karna hai",
-            "deadlineText": null,
-            "deadline": null,
-            "estimatedMinutes": 45
+            "deadline": "2026-10-04"
           },
           {
             "id": "g3",
             "title": "Mummy ke liye doctor appointment book karni hai",
-            "deadlineText": null,
-            "deadline": null,
-            "estimatedMinutes": 15
+            "deadline": "2026-10-04"
           }
         ],
         "tasks": [
@@ -45,7 +39,7 @@
             "id": "t1",
             "goalId": "g1",
             "isFirstStep": true,
-            "title": "Open the electricity bill payment portal on the phone or computer",
+            "title": "Open the electricity bill PDF on the phone",
             "minutes": 5,
             "dependsOn": []
           },
@@ -53,8 +47,8 @@
             "id": "t2",
             "goalId": "g1",
             "isFirstStep": false,
-            "title": "Enter the electricity bill amount and pay using a card or UPI",
-            "minutes": 5,
+            "title": "Pay the electricity bill through the mobile app",
+            "minutes": 10,
             "dependsOn": [
               "t1"
             ]
@@ -63,16 +57,16 @@
             "id": "t3",
             "goalId": "g2",
             "isFirstStep": true,
-            "title": "Write down the gym routine for Saturday and Sunday",
-            "minutes": 10,
+            "title": "Put the gym shoes in the closet",
+            "minutes": 5,
             "dependsOn": []
           },
           {
             "id": "t4",
             "goalId": "g2",
             "isFirstStep": false,
-            "title": "Set a reminder for the gym routine on Saturday and Sunday",
-            "minutes": 5,
+            "title": "Write the gym routine on a piece of paper",
+            "minutes": 10,
             "dependsOn": [
               "t3"
             ]
@@ -81,7 +75,7 @@
             "id": "t5",
             "goalId": "g3",
             "isFirstStep": true,
-            "title": "Open the doctor appointment booking portal on the phone or computer",
+            "title": "Open the doctor's website on the phone",
             "minutes": 5,
             "dependsOn": []
           },
@@ -89,7 +83,7 @@
             "id": "t6",
             "goalId": "g3",
             "isFirstStep": false,
-            "title": "Search for a doctor and book an appointment for Mummy",
+            "title": "Book the doctor appointment for Mummy",
             "minutes": 10,
             "dependsOn": [
               "t5"
@@ -100,7 +94,7 @@
     },
     {
       "kind": "english",
-      "seconds": 2.2,
+      "seconds": 2.1,
       "output": {
         "titles": [
           {
@@ -124,30 +118,24 @@
       {
         "id": "g1",
         "title": "Pay Electricity Bill",
-        "deadline": "2026-10-03",
-        "deadlineText": "kal tak",
-        "estimatedMinutes": 10
+        "deadline": "2026-10-02"
       },
       {
         "id": "g2",
         "title": "Start Gym Routine for Weekend",
-        "deadline": null,
-        "deadlineText": null,
-        "estimatedMinutes": 45
+        "deadline": "2026-10-04"
       },
       {
         "id": "g3",
         "title": "Book Doctor Appointment for Mummy",
-        "deadline": null,
-        "deadlineText": null,
-        "estimatedMinutes": 15
+        "deadline": "2026-10-04"
       }
     ],
     "tasks": [
       {
         "id": "t1",
         "goalId": "g1",
-        "title": "Open the electricity bill payment portal on the phone or computer",
+        "title": "Open the electricity bill PDF on the phone",
         "minutes": 5,
         "dependsOn": [],
         "isFirstStep": true
@@ -155,8 +143,8 @@
       {
         "id": "t2",
         "goalId": "g1",
-        "title": "Enter the electricity bill amount and pay using a card or UPI",
-        "minutes": 5,
+        "title": "Pay the electricity bill through the mobile app",
+        "minutes": 10,
         "dependsOn": [
           "t1"
         ],
@@ -165,16 +153,16 @@
       {
         "id": "t3",
         "goalId": "g2",
-        "title": "Write down the gym routine for Saturday and Sunday",
-        "minutes": 10,
+        "title": "Put the gym shoes in the closet",
+        "minutes": 5,
         "dependsOn": [],
         "isFirstStep": true
       },
       {
         "id": "t4",
         "goalId": "g2",
-        "title": "Set a reminder for the gym routine on Saturday and Sunday",
-        "minutes": 5,
+        "title": "Write the gym routine on a piece of paper",
+        "minutes": 10,
         "dependsOn": [
           "t3"
         ],
@@ -183,7 +171,7 @@
       {
         "id": "t5",
         "goalId": "g3",
-        "title": "Open the doctor appointment booking portal on the phone or computer",
+        "title": "Open the doctor's website on the phone",
         "minutes": 5,
         "dependsOn": [],
         "isFirstStep": true
@@ -191,7 +179,7 @@
       {
         "id": "t6",
         "goalId": "g3",
-        "title": "Search for a doctor and book an appointment for Mummy",
+        "title": "Book the doctor appointment for Mummy",
         "minutes": 10,
         "dependsOn": [
           "t5"

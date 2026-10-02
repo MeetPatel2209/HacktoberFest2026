@@ -2,9 +2,11 @@
 // Simple subset only: no numeric bounds, patterns or $ref; validate.js enforces the exact rules.
 // Property order is deliberate: it is the order the model generates fields in.
 
-// Call 2: decompose goals. Goals first so goalIds point at goals that already exist;
-// isFirstStep before title so the model commits to "tiny" before writing it;
-// title before minutes so the estimate follows the action; dependsOn last, pointing back.
+// Call 2: decompose goals. Goals first so goalIds point at goals that already exist.
+// Per goal: deadlineText (quoted evidence) before deadline, so the date is read off the quote and
+// code can drop deadlines with no evidence; estimatedMinutes so the model sizes the whole goal
+// before writing its tasks. Per task: isFirstStep before title so the model commits to "tiny"
+// before writing it; title before minutes so the estimate follows the action; dependsOn last.
 export const PLAN_SCHEMA = {
   type: 'object',
   properties: {
@@ -15,9 +17,11 @@ export const PLAN_SCHEMA = {
         properties: {
           id: { type: 'string' },
           title: { type: 'string' },
+          deadlineText: { type: ['string', 'null'] },
           deadline: { type: ['string', 'null'] },
+          estimatedMinutes: { type: 'integer' },
         },
-        required: ['id', 'title', 'deadline'],
+        required: ['id', 'title', 'deadlineText', 'deadline', 'estimatedMinutes'],
         additionalProperties: false,
       },
     },

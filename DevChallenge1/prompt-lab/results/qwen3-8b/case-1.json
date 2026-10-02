@@ -9,17 +9,19 @@
   },
   "today": "2026-10-02",
   "maxMinutes": 25,
-  "totalSeconds": 7.2,
+  "totalSeconds": 12.2,
   "calls": [
     {
       "kind": "plan",
-      "seconds": 7.2,
+      "seconds": 12.2,
       "output": {
         "goals": [
           {
             "id": "g1",
             "title": "Get my life together",
-            "deadline": null
+            "deadlineText": null,
+            "deadline": null,
+            "estimatedMinutes": 150
           }
         ],
         "tasks": [
@@ -27,16 +29,16 @@
             "id": "t1",
             "goalId": "g1",
             "isFirstStep": true,
-            "title": "Write down three areas of my life that feel out of control",
-            "minutes": 10,
+            "title": "Write down 5 things that are causing stress in my life",
+            "minutes": 5,
             "dependsOn": []
           },
           {
             "id": "t2",
             "goalId": "g1",
             "isFirstStep": false,
-            "title": "Write one specific action for each area to start fixing it",
-            "minutes": 15,
+            "title": "List 3 small steps to reduce each stressor",
+            "minutes": 10,
             "dependsOn": [
               "t1"
             ]
@@ -45,10 +47,80 @@
             "id": "t3",
             "goalId": "g1",
             "isFirstStep": false,
-            "title": "Pick one area and write the first step to address it",
-            "minutes": 10,
+            "title": "Pick one stressor and write its first step in a notebook",
+            "minutes": 5,
             "dependsOn": [
               "t2"
+            ]
+          },
+          {
+            "id": "t4",
+            "goalId": "g1",
+            "isFirstStep": false,
+            "title": "Write 3 things I can do today to start improving my life",
+            "minutes": 10,
+            "dependsOn": [
+              "t3"
+            ]
+          },
+          {
+            "id": "t5",
+            "goalId": "g1",
+            "isFirstStep": false,
+            "title": "Do one thing from the list I wrote today",
+            "minutes": 5,
+            "dependsOn": [
+              "t4"
+            ]
+          },
+          {
+            "id": "t6",
+            "goalId": "g1",
+            "isFirstStep": false,
+            "title": "Write a short note on how I feel after doing that task",
+            "minutes": 5,
+            "dependsOn": [
+              "t5"
+            ]
+          },
+          {
+            "id": "t7",
+            "goalId": "g1",
+            "isFirstStep": false,
+            "title": "Review the list of stressors and pick another one to work on tomorrow",
+            "minutes": 5,
+            "dependsOn": [
+              "t6"
+            ]
+          },
+          {
+            "id": "t8",
+            "goalId": "g1",
+            "isFirstStep": false,
+            "title": "Write one more small step for the next stressor",
+            "minutes": 5,
+            "dependsOn": [
+              "t7"
+            ]
+          },
+          {
+            "id": "t9",
+            "goalId": "g1",
+            "isFirstStep": false,
+            "title": "Put the notebook in a place where I will see it every day",
+            "minutes": 5,
+            "dependsOn": [
+              "t8"
+            ]
+          },
+          {
+            "id": "t10",
+            "goalId": "g1",
+            "isFirstStep": false,
+            "title": "Review the notebook and add any new stressors I might have missed",
+            "minutes": 5,
+            "dependsOn": [
+              "t9"
             ]
           }
         ]
@@ -60,23 +132,25 @@
       {
         "id": "g1",
         "title": "Get my life together",
-        "deadline": null
+        "deadline": null,
+        "deadlineText": null,
+        "estimatedMinutes": 150
       }
     ],
     "tasks": [
       {
         "id": "t1",
         "goalId": "g1",
-        "title": "Write down three areas of my life that feel out of control",
-        "minutes": 10,
+        "title": "Write down 5 things that are causing stress in my life",
+        "minutes": 5,
         "dependsOn": [],
         "isFirstStep": true
       },
       {
         "id": "t2",
         "goalId": "g1",
-        "title": "Write one specific action for each area to start fixing it",
-        "minutes": 15,
+        "title": "List 3 small steps to reduce each stressor",
+        "minutes": 10,
         "dependsOn": [
           "t1"
         ],
@@ -85,10 +159,80 @@
       {
         "id": "t3",
         "goalId": "g1",
-        "title": "Pick one area and write the first step to address it",
-        "minutes": 10,
+        "title": "Pick one stressor and write its first step in a notebook",
+        "minutes": 5,
         "dependsOn": [
           "t2"
+        ],
+        "isFirstStep": false
+      },
+      {
+        "id": "t4",
+        "goalId": "g1",
+        "title": "Write 3 things I can do today to start improving my life",
+        "minutes": 10,
+        "dependsOn": [
+          "t3"
+        ],
+        "isFirstStep": false
+      },
+      {
+        "id": "t5",
+        "goalId": "g1",
+        "title": "Do one thing from the list I wrote today",
+        "minutes": 5,
+        "dependsOn": [
+          "t4"
+        ],
+        "isFirstStep": false
+      },
+      {
+        "id": "t6",
+        "goalId": "g1",
+        "title": "Write a short note on how I feel after doing that task",
+        "minutes": 5,
+        "dependsOn": [
+          "t5"
+        ],
+        "isFirstStep": false
+      },
+      {
+        "id": "t7",
+        "goalId": "g1",
+        "title": "Review the list of stressors and pick another one to work on tomorrow",
+        "minutes": 5,
+        "dependsOn": [
+          "t6"
+        ],
+        "isFirstStep": false
+      },
+      {
+        "id": "t8",
+        "goalId": "g1",
+        "title": "Write one more small step for the next stressor",
+        "minutes": 5,
+        "dependsOn": [
+          "t7"
+        ],
+        "isFirstStep": false
+      },
+      {
+        "id": "t9",
+        "goalId": "g1",
+        "title": "Put the notebook in a place where I will see it every day",
+        "minutes": 5,
+        "dependsOn": [
+          "t8"
+        ],
+        "isFirstStep": false
+      },
+      {
+        "id": "t10",
+        "goalId": "g1",
+        "title": "Review the notebook and add any new stressors I might have missed",
+        "minutes": 5,
+        "dependsOn": [
+          "t9"
         ],
         "isFirstStep": false
       }

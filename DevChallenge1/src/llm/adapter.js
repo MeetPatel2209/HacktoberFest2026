@@ -10,6 +10,10 @@ export const OLLAMA_URL = 'http://localhost:11434';
 // Comparing llama3.1:8b vs qwen3:8b (think: false) on the manual test cases; winner becomes the default.
 export const DEFAULT_MODEL = 'llama3.1:8b';
 export const DEFAULT_TIMEOUT_MS = 120_000; // generous; on the friend's RTX 4060 a call should take seconds
+// Context window (prompt + answer). Ollama's default 4096 is too tight for a 3-goal plan.
+export const DEFAULT_NUM_CTX = 8192;
+// Cap on answer length. Real plans are ~1000 tokens; a model stuck repeating itself is cut off here.
+export const DEFAULT_MAX_TOKENS = 3000;
 
 export class LLMError extends Error {
   // kind: "unreachable" | "model-missing" | "timeout" | "http" | "bad-output"
@@ -25,6 +29,8 @@ export function createOllamaAdapter({
   baseUrl = OLLAMA_URL,
   model = DEFAULT_MODEL,
   timeoutMs = DEFAULT_TIMEOUT_MS,
+  numCtx = DEFAULT_NUM_CTX,
+  maxTokens = DEFAULT_MAX_TOKENS,
   // true/false for thinking models (qwen3: pass false); leave undefined for models without it.
   think,
   fetch = globalThis.fetch,
@@ -35,7 +41,7 @@ export function createOllamaAdapter({
       messages,
       stream: false,
       format: schema,
-      options: { temperature: 0 },
+      options: { temperature: 0, num_ctx: numCtx, num_predict: maxTokens },
     };
     if (think !== undefined) body.think = think;
     const data = await request(fetch, `${baseUrl}/api/chat`, timeoutMs, {
@@ -44,6 +50,9 @@ export function createOllamaAdapter({
       body: JSON.stringify(body),
     });
 
+    if (data?.done_reason === 'length') {
+      throw new LLMError('bad-output', `Answer was cut off after ${maxTokens} tokens; the model was probably repeating itself`);
+    }
     const content = data?.message?.content;
     if (typeof content !== 'string') {
       throw new LLMError('bad-output', 'Ollama response had no message content');

@@ -23,7 +23,7 @@ describe('ollama adapter: complete', () => {
       messages,
       stream: false,
       format: schema,
-      options: { temperature: 0 },
+      options: { temperature: 0, num_ctx: 8192, num_predict: 3000 },
     });
   });
 
@@ -66,6 +66,13 @@ describe('ollama adapter: complete', () => {
     const fetch = vi.fn().mockResolvedValue(chatReply('Sure! Here is your plan:'));
     const err = await createOllamaAdapter({ fetch }).complete(messages, schema).catch((e) => e);
     expect(err.kind).toBe('bad-output');
+  });
+
+  it('reports a cut-off answer (hit the token cap) as bad output', async () => {
+    const fetch = vi.fn().mockResolvedValue(jsonResponse({ message: { content: '{"goals":[{"id":"g1"' }, done: true, done_reason: 'length' }));
+    const err = await createOllamaAdapter({ fetch, maxTokens: 50 }).complete(messages, schema).catch((e) => e);
+    expect(err.kind).toBe('bad-output');
+    expect(err.message).toMatch(/cut off after 50 tokens/);
   });
 
   it('reports bad output when there is no message content', async () => {
