@@ -1,0 +1,191 @@
+{
+  "model": "qwen3:8b",
+  "case": {
+    "name": "Hinglish input (output must be English)",
+    "brainDump": "kal tak electricity bill pay karna hai, aur weekend pe gym ka routine start karna hai, plus mummy ke liye doctor appointment book karni hai",
+    "expectDeadlines": [
+      "2026-10-03",
+      "2026-10-04",
+      null
+    ]
+  },
+  "today": "2026-10-02",
+  "maxMinutes": 25,
+  "totalSeconds": 15.4,
+  "calls": [
+    {
+      "kind": "plan",
+      "seconds": 13.3,
+      "output": {
+        "goals": [
+          {
+            "id": "g1",
+            "title": "Electricity bill pay karna hai",
+            "deadline": "2026-10-02"
+          },
+          {
+            "id": "g2",
+            "title": "Weekend pe gym ka routine start karna hai",
+            "deadline": "2026-10-04"
+          },
+          {
+            "id": "g3",
+            "title": "Mummy ke liye doctor appointment book karni hai",
+            "deadline": "2026-10-04"
+          }
+        ],
+        "tasks": [
+          {
+            "id": "t1",
+            "goalId": "g1",
+            "isFirstStep": true,
+            "title": "Open the electricity bill PDF on the phone",
+            "minutes": 5,
+            "dependsOn": []
+          },
+          {
+            "id": "t2",
+            "goalId": "g1",
+            "isFirstStep": false,
+            "title": "Pay the electricity bill through the mobile app",
+            "minutes": 10,
+            "dependsOn": [
+              "t1"
+            ]
+          },
+          {
+            "id": "t3",
+            "goalId": "g2",
+            "isFirstStep": true,
+            "title": "Put the gym shoes in the closet",
+            "minutes": 5,
+            "dependsOn": []
+          },
+          {
+            "id": "t4",
+            "goalId": "g2",
+            "isFirstStep": false,
+            "title": "Write the gym routine on a piece of paper",
+            "minutes": 10,
+            "dependsOn": [
+              "t3"
+            ]
+          },
+          {
+            "id": "t5",
+            "goalId": "g3",
+            "isFirstStep": true,
+            "title": "Open the doctor's website on the phone",
+            "minutes": 5,
+            "dependsOn": []
+          },
+          {
+            "id": "t6",
+            "goalId": "g3",
+            "isFirstStep": false,
+            "title": "Book the doctor appointment for Mummy",
+            "minutes": 10,
+            "dependsOn": [
+              "t5"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "kind": "english",
+      "seconds": 2.1,
+      "output": {
+        "titles": [
+          {
+            "id": "g1",
+            "title": "Pay Electricity Bill"
+          },
+          {
+            "id": "g2",
+            "title": "Start Gym Routine for Weekend"
+          },
+          {
+            "id": "g3",
+            "title": "Book Doctor Appointment for Mummy"
+          }
+        ]
+      }
+    }
+  ],
+  "plan": {
+    "goals": [
+      {
+        "id": "g1",
+        "title": "Pay Electricity Bill",
+        "deadline": "2026-10-02"
+      },
+      {
+        "id": "g2",
+        "title": "Start Gym Routine for Weekend",
+        "deadline": "2026-10-04"
+      },
+      {
+        "id": "g3",
+        "title": "Book Doctor Appointment for Mummy",
+        "deadline": "2026-10-04"
+      }
+    ],
+    "tasks": [
+      {
+        "id": "t1",
+        "goalId": "g1",
+        "title": "Open the electricity bill PDF on the phone",
+        "minutes": 5,
+        "dependsOn": [],
+        "isFirstStep": true
+      },
+      {
+        "id": "t2",
+        "goalId": "g1",
+        "title": "Pay the electricity bill through the mobile app",
+        "minutes": 10,
+        "dependsOn": [
+          "t1"
+        ],
+        "isFirstStep": false
+      },
+      {
+        "id": "t3",
+        "goalId": "g2",
+        "title": "Put the gym shoes in the closet",
+        "minutes": 5,
+        "dependsOn": [],
+        "isFirstStep": true
+      },
+      {
+        "id": "t4",
+        "goalId": "g2",
+        "title": "Write the gym routine on a piece of paper",
+        "minutes": 10,
+        "dependsOn": [
+          "t3"
+        ],
+        "isFirstStep": false
+      },
+      {
+        "id": "t5",
+        "goalId": "g3",
+        "title": "Open the doctor's website on the phone",
+        "minutes": 5,
+        "dependsOn": [],
+        "isFirstStep": true
+      },
+      {
+        "id": "t6",
+        "goalId": "g3",
+        "title": "Book the doctor appointment for Mummy",
+        "minutes": 10,
+        "dependsOn": [
+          "t5"
+        ],
+        "isFirstStep": false
+      }
+    ]
+  }
+}

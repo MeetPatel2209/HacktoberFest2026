@@ -1,0 +1,171 @@
+{
+  "model": "qwen3:8b",
+  "case": {
+    "name": "Three goals, different deadlines",
+    "brainDump": "thesis chapter 3 due next Friday, resume to Priya by Monday, and renew my passport sometime this month",
+    "expectDeadlines": [
+      "2026-10-09",
+      "2026-10-05",
+      "2026-10-31"
+    ]
+  },
+  "today": "2026-10-02",
+  "maxMinutes": 25,
+  "totalSeconds": 12,
+  "calls": [
+    {
+      "kind": "plan",
+      "seconds": 12,
+      "output": {
+        "goals": [
+          {
+            "id": "g1",
+            "title": "Thesis chapter 3",
+            "deadline": "2026-10-09"
+          },
+          {
+            "id": "g2",
+            "title": "Resume to Priya",
+            "deadline": "2026-10-08"
+          },
+          {
+            "id": "g3",
+            "title": "Renew my passport",
+            "deadline": "2026-10-31"
+          }
+        ],
+        "tasks": [
+          {
+            "id": "t1",
+            "goalId": "g1",
+            "isFirstStep": true,
+            "title": "Open the thesis chapter 3 document",
+            "minutes": 5,
+            "dependsOn": []
+          },
+          {
+            "id": "t2",
+            "goalId": "g1",
+            "isFirstStep": false,
+            "title": "Write one paragraph of the thesis chapter 3",
+            "minutes": 25,
+            "dependsOn": [
+              "t1"
+            ]
+          },
+          {
+            "id": "t3",
+            "goalId": "g2",
+            "isFirstStep": true,
+            "title": "Open the resume document",
+            "minutes": 5,
+            "dependsOn": []
+          },
+          {
+            "id": "t4",
+            "goalId": "g2",
+            "isFirstStep": false,
+            "title": "Email the resume PDF to Priya",
+            "minutes": 5,
+            "dependsOn": [
+              "t3"
+            ]
+          },
+          {
+            "id": "t5",
+            "goalId": "g3",
+            "isFirstStep": true,
+            "title": "Put the passport renewal form on the desk",
+            "minutes": 5,
+            "dependsOn": []
+          },
+          {
+            "id": "t6",
+            "goalId": "g3",
+            "isFirstStep": false,
+            "title": "Fill in the passport renewal form",
+            "minutes": 25,
+            "dependsOn": [
+              "t5"
+            ]
+          }
+        ]
+      }
+    }
+  ],
+  "plan": {
+    "goals": [
+      {
+        "id": "g1",
+        "title": "Thesis chapter 3",
+        "deadline": "2026-10-09"
+      },
+      {
+        "id": "g2",
+        "title": "Resume to Priya",
+        "deadline": "2026-10-08"
+      },
+      {
+        "id": "g3",
+        "title": "Renew my passport",
+        "deadline": "2026-10-31"
+      }
+    ],
+    "tasks": [
+      {
+        "id": "t1",
+        "goalId": "g1",
+        "title": "Open the thesis chapter 3 document",
+        "minutes": 5,
+        "dependsOn": [],
+        "isFirstStep": true
+      },
+      {
+        "id": "t2",
+        "goalId": "g1",
+        "title": "Write one paragraph of the thesis chapter 3",
+        "minutes": 25,
+        "dependsOn": [
+          "t1"
+        ],
+        "isFirstStep": false
+      },
+      {
+        "id": "t3",
+        "goalId": "g2",
+        "title": "Open the resume document",
+        "minutes": 5,
+        "dependsOn": [],
+        "isFirstStep": true
+      },
+      {
+        "id": "t4",
+        "goalId": "g2",
+        "title": "Email the resume PDF to Priya",
+        "minutes": 5,
+        "dependsOn": [
+          "t3"
+        ],
+        "isFirstStep": false
+      },
+      {
+        "id": "t5",
+        "goalId": "g3",
+        "title": "Put the passport renewal form on the desk",
+        "minutes": 5,
+        "dependsOn": [],
+        "isFirstStep": true
+      },
+      {
+        "id": "t6",
+        "goalId": "g3",
+        "title": "Fill in the passport renewal form",
+        "minutes": 25,
+        "dependsOn": [
+          "t5"
+        ],
+        "isFirstStep": false
+      }
+    ]
+  }
+}

@@ -312,6 +312,18 @@ describe('enforceEnglish', () => {
     expect(r.tasks[0].title).toBe('Bill ka app kholo');
   });
 
+  it('accepts bare ids echoed back by the model, but not ambiguous ones', async () => {
+    const plan = { goals: [{ id: 'x1', title: 'Bill pay karna', deadline: null }], tasks: [task('x1', 5, [], { title: 'App kholo', goalId: 'x1' }), task('t2', 5, [], { title: 'Gym jao', goalId: 'x1' })] };
+    const toEnglish = vi.fn().mockResolvedValueOnce([
+      { id: 'x1', title: 'Ambiguous' }, // matches goal:x1 and task:x1, so ignored
+      { id: 't2', title: 'Go to the gym' },
+      { id: 'goal:x1', title: 'Pay the bill' },
+    ]);
+    const r = await enforceEnglish(plan, toEnglish);
+    expect(r.goals[0].title).toBe('Pay the bill');
+    expect(r.tasks.map((t) => t.title)).toEqual(['App kholo', 'Go to the gym']);
+  });
+
   it('never calls the model when everything is English', async () => {
     const toEnglish = vi.fn();
     const plan = { goals: [{ id: 'g1', title: 'Resume', deadline: null }], tasks: [task('t1', 5)] };

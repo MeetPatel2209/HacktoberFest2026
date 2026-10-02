@@ -1,0 +1,97 @@
+{
+  "model": "qwen3:8b",
+  "case": {
+    "name": "Huge vague goal",
+    "brainDump": "get my life together",
+    "expectDeadlines": [
+      null
+    ]
+  },
+  "today": "2026-10-02",
+  "maxMinutes": 25,
+  "totalSeconds": 7.2,
+  "calls": [
+    {
+      "kind": "plan",
+      "seconds": 7.2,
+      "output": {
+        "goals": [
+          {
+            "id": "g1",
+            "title": "Get my life together",
+            "deadline": null
+          }
+        ],
+        "tasks": [
+          {
+            "id": "t1",
+            "goalId": "g1",
+            "isFirstStep": true,
+            "title": "Write down three areas of my life that feel out of control",
+            "minutes": 10,
+            "dependsOn": []
+          },
+          {
+            "id": "t2",
+            "goalId": "g1",
+            "isFirstStep": false,
+            "title": "Write one specific action for each area to start fixing it",
+            "minutes": 15,
+            "dependsOn": [
+              "t1"
+            ]
+          },
+          {
+            "id": "t3",
+            "goalId": "g1",
+            "isFirstStep": false,
+            "title": "Pick one area and write the first step to address it",
+            "minutes": 10,
+            "dependsOn": [
+              "t2"
+            ]
+          }
+        ]
+      }
+    }
+  ],
+  "plan": {
+    "goals": [
+      {
+        "id": "g1",
+        "title": "Get my life together",
+        "deadline": null
+      }
+    ],
+    "tasks": [
+      {
+        "id": "t1",
+        "goalId": "g1",
+        "title": "Write down three areas of my life that feel out of control",
+        "minutes": 10,
+        "dependsOn": [],
+        "isFirstStep": true
+      },
+      {
+        "id": "t2",
+        "goalId": "g1",
+        "title": "Write one specific action for each area to start fixing it",
+        "minutes": 15,
+        "dependsOn": [
+          "t1"
+        ],
+        "isFirstStep": false
+      },
+      {
+        "id": "t3",
+        "goalId": "g1",
+        "title": "Pick one area and write the first step to address it",
+        "minutes": 10,
+        "dependsOn": [
+          "t2"
+        ],
+        "isFirstStep": false
+      }
+    ]
+  }
+}

@@ -1,0 +1,157 @@
+{
+  "model": "qwen3:8b",
+  "case": {
+    "name": "Already broken down by the user",
+    "brainDump": "Portfolio site: 1) pick a template 2) write about page 3) add 3 projects with screenshots 4) deploy to GitHub Pages",
+    "expectDeadlines": [
+      null
+    ]
+  },
+  "today": "2026-10-02",
+  "maxMinutes": 25,
+  "totalSeconds": 11.3,
+  "calls": [
+    {
+      "kind": "plan",
+      "seconds": 11.3,
+      "output": {
+        "goals": [
+          {
+            "id": "g1",
+            "title": "Portfolio site",
+            "deadline": "2026-10-31"
+          }
+        ],
+        "tasks": [
+          {
+            "id": "t1",
+            "goalId": "g1",
+            "isFirstStep": true,
+            "title": "Open a new folder on the computer for the portfolio site",
+            "minutes": 5,
+            "dependsOn": []
+          },
+          {
+            "id": "t2",
+            "goalId": "g1",
+            "isFirstStep": false,
+            "title": "Pick a template from a website and save it to the portfolio folder",
+            "minutes": 10,
+            "dependsOn": [
+              "t1"
+            ]
+          },
+          {
+            "id": "t3",
+            "goalId": "g1",
+            "isFirstStep": false,
+            "title": "Write a short paragraph about the person for the homepage",
+            "minutes": 10,
+            "dependsOn": [
+              "t2"
+            ]
+          },
+          {
+            "id": "t4",
+            "goalId": "g1",
+            "isFirstStep": false,
+            "title": "Take three screenshots of projects and save them in the portfolio folder",
+            "minutes": 10,
+            "dependsOn": [
+              "t3"
+            ]
+          },
+          {
+            "id": "t5",
+            "goalId": "g1",
+            "isFirstStep": false,
+            "title": "Add the three project screenshots to the template in the portfolio folder",
+            "minutes": 10,
+            "dependsOn": [
+              "t4"
+            ]
+          },
+          {
+            "id": "t6",
+            "goalId": "g1",
+            "isFirstStep": false,
+            "title": "Deploy the portfolio site to GitHub Pages using the template",
+            "minutes": 25,
+            "dependsOn": [
+              "t5"
+            ]
+          }
+        ]
+      }
+    }
+  ],
+  "plan": {
+    "goals": [
+      {
+        "id": "g1",
+        "title": "Portfolio site",
+        "deadline": "2026-10-31"
+      }
+    ],
+    "tasks": [
+      {
+        "id": "t1",
+        "goalId": "g1",
+        "title": "Open a new folder on the computer for the portfolio site",
+        "minutes": 5,
+        "dependsOn": [],
+        "isFirstStep": true
+      },
+      {
+        "id": "t2",
+        "goalId": "g1",
+        "title": "Pick a template from a website and save it to the portfolio folder",
+        "minutes": 10,
+        "dependsOn": [
+          "t1"
+        ],
+        "isFirstStep": false
+      },
+      {
+        "id": "t3",
+        "goalId": "g1",
+        "title": "Write a short paragraph about the person for the homepage",
+        "minutes": 10,
+        "dependsOn": [
+          "t2"
+        ],
+        "isFirstStep": false
+      },
+      {
+        "id": "t4",
+        "goalId": "g1",
+        "title": "Take three screenshots of projects and save them in the portfolio folder",
+        "minutes": 10,
+        "dependsOn": [
+          "t3"
+        ],
+        "isFirstStep": false
+      },
+      {
+        "id": "t5",
+        "goalId": "g1",
+        "title": "Add the three project screenshots to the template in the portfolio folder",
+        "minutes": 10,
+        "dependsOn": [
+          "t4"
+        ],
+        "isFirstStep": false
+      },
+      {
+        "id": "t6",
+        "goalId": "g1",
+        "title": "Deploy the portfolio site to GitHub Pages using the template",
+        "minutes": 25,
+        "dependsOn": [
+          "t5"
+        ],
+        "isFirstStep": false
+      }
+    ]
+  }
+}

@@ -290,8 +290,17 @@ export async function enforceEnglish(plan, toEnglish) {
     } catch {
       break;
     }
+    // Models often echo the bare id ("g1") instead of the label we sent ("goal:g1"); accept either
+    // when it points at exactly one item we asked about.
+    const resolve = (id) => {
+      if (items.some((i) => i.id === id)) return id;
+      const matches = items.filter((i) => i.id.split(':')[1] === id);
+      return matches.length === 1 ? matches[0].id : null;
+    };
     for (const r of Array.isArray(rewritten) ? rewritten : []) {
-      if (isObject(r) && isNonEmptyString(r.title) && !looksNonEnglish(r.title)) fixed.set(r.id, r.title);
+      if (!isObject(r) || !isNonEmptyString(r.title) || looksNonEnglish(r.title)) continue;
+      const id = resolve(r.id);
+      if (id) fixed.set(id, r.title);
     }
   }
   const apply = (kind) => (x) => (fixed.has(key(kind, x)) ? { ...x, title: fixed.get(key(kind, x)) } : x);
