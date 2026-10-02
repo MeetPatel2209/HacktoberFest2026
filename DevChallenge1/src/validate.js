@@ -3,12 +3,13 @@
 // No model access here: anything that needs to ask the model again is passed in as a function,
 // so this stays testable and the adapter stays the only thing that talks to the model.
 //
-// validatePlan(requestPlan, { maxMinutes, splitTask, shrinkFirstStep }) -> Promise<{ goals, tasks }>
-//   requestPlan(feedback | null)       -> raw Call 2 response (object or JSON string)
-//   splitTask(task, maxMinutes)        -> [{ title, minutes }]  ("split this into steps of at most N minutes")
-//   shrinkFirstStep(task, maxMinutes)  -> { title, minutes }    ("give a smaller first step")
+// validatePlan(requestPlan, { maxMinutes, splitTask, shrinkFirstStep, toEnglish }) -> Promise<{ goals, tasks }>
+//   requestPlan(feedback | null)             -> raw Call 2 response (object or JSON string)
+//   splitTask(task, maxMinutes, goal)        -> [{ title, minutes }]  ("split this into steps of at most N minutes")
+//   shrinkFirstStep(task, maxMinutes, goal)  -> { title, minutes }    ("give a tiny step to do before this")
+//   toEnglish([{ id, title }])               -> [{ id, title }]       ("rewrite these in English")
 //
-// Order: shape (1), dependency cleanup (4), size cap (2), first step (3), minimum (5).
+// Order: shape (1), dependency cleanup (4), size cap (2), first step (3), English titles, minimum (5).
 // Dependency cleanup runs early because splitting rewires edges and first-step detection
 // reads dependsOn; both need clean edges.
 
@@ -26,27 +27,23 @@ export class PlanError extends Error {
 
 export const FRIENDLY_ERROR = "Couldn't turn that into a plan. Try again, or reword it a little.";
 
-export async function validatePlan(requestPlan, { maxMinutes, splitTask, shrinkFirstStep } = {}) {
+export async function validatePlan(requestPlan, { maxMinutes, splitTask, shrinkFirstStep, toEnglish } = {}) {
   let plan = await parseWithRetry(requestPlan);
-  plan = { goals: plan.goals, tasks: cleanDependencies(plan.tasks) };
-  plan = { ...plan, tasks: await enforceSizeCap(plan.tasks, maxMinutes, splitTask) };
-  plan = { ...plan, tasks: await enforceFirstStep(plan.tasks, shrinkFirstStep, maxMinutes) };
+  const { goals } = plan;
+  plan = { goals, tasks: cleanDependencies(plan.tasks) };
+  plan = { goals, tasks: await enforceSizeCap(plan.tasks, maxMinutes, splitTask, goals) };
+  plan = { goals, tasks: await enforceFirstStep(plan.tasks, shrinkFirstStep, maxMinutes, goals) };
+  plan = await enforceEnglish(plan, toEnglish);
   return { ...plan, tasks: clampMinimum(plan.tasks) };
 }
 
 // 1. Parse against the schema; retry once with the errors appended; then a friendly error.
+// A request that throws (model unreachable, timeout) is not retried: the caller needs that error.
 export async function parseWithRetry(requestPlan) {
   let feedback = null;
   let errors = [];
   for (let attempt = 0; attempt < 2; attempt++) {
-    let raw;
-    try {
-      raw = await requestPlan(feedback);
-    } catch (err) {
-      errors = [`request failed: ${err.message}`];
-      feedback = errors.join('\n');
-      continue;
-    }
+    const raw = await requestPlan(feedback);
     const result = checkShape(raw);
     if (result.ok) return result.plan;
     errors = result.errors;
@@ -116,14 +113,15 @@ export function checkShape(raw) {
 }
 
 // 2. Tasks over maxMinutes go back to the model to split (max 2 rounds), then code splits equally.
-export async function enforceSizeCap(tasks, maxMinutes, splitTask) {
+export async function enforceSizeCap(tasks, maxMinutes, splitTask, goals = []) {
+  const goalById = new Map(goals.map((g) => [g.id, g]));
   let current = tasks;
   for (let round = 0; round < MAX_SPLIT_ROUNDS && splitTask; round++) {
     if (!current.some((t) => t.minutes > maxMinutes)) return current;
     const parts = new Map();
     for (const t of current) {
       if (t.minutes > maxMinutes) {
-        const split = await trySplit(splitTask, t, maxMinutes);
+        const split = await trySplit(splitTask, t, maxMinutes, goalById.get(t.goalId));
         if (split) parts.set(t.id, split);
       }
     }
@@ -136,9 +134,9 @@ export async function enforceSizeCap(tasks, maxMinutes, splitTask) {
   return applySplits(current, parts);
 }
 
-async function trySplit(splitTask, task, maxMinutes) {
+async function trySplit(splitTask, task, maxMinutes, goal) {
   try {
-    const parts = await splitTask(task, maxMinutes);
+    const parts = await splitTask(task, maxMinutes, goal);
     const ok =
       Array.isArray(parts) &&
       parts.length > 0 &&
@@ -175,9 +173,7 @@ function applySplits(tasks, partsById) {
     }
     let prev = null;
     parts.forEach((p, i) => {
-      let id = `${t.id}.${i + 1}`;
-      while (taken.has(id)) id += '_';
-      taken.add(id);
+      const id = freshId(`${t.id}.${i + 1}`, taken);
       out.push({
         id,
         goalId: t.goalId,
@@ -193,36 +189,50 @@ function applySplits(tasks, partsById) {
   return out.map((t) => ({ ...t, dependsOn: t.dependsOn.map((d) => lastPart.get(d) ?? d) }));
 }
 
-// 3. One first step per goal, at most 10 min: ask the model once for a smaller one, else clamp.
-export async function enforceFirstStep(tasks, shrinkFirstStep, maxMinutes) {
+// 3. One first step per goal, at most 10 min. If it's bigger, ask the model for a tiny step to do
+// before it; the original stays as the next task so no work is lost. If the model can't help,
+// split the original into a 10-minute start and the rest.
+export async function enforceFirstStep(tasks, shrinkFirstStep, maxMinutes, goals = []) {
+  const goalById = new Map(goals.map((g) => [g.id, g]));
   const firstIds = new Set();
-  const goals = [...new Set(tasks.map((t) => t.goalId))];
-  for (const g of goals) {
+  for (const g of new Set(tasks.map((t) => t.goalId))) {
     const inGoal = tasks.filter((t) => t.goalId === g);
     const first = inGoal.find((t) => t.isFirstStep) ?? inGoal.find((t) => t.dependsOn.length === 0) ?? inGoal[0];
     firstIds.add(first.id);
   }
 
+  const taken = new Set(tasks.map((t) => t.id));
   const out = [];
   for (const t of tasks) {
     if (!firstIds.has(t.id)) {
       out.push({ ...t, isFirstStep: false });
       continue;
     }
-    let step = { ...t, isFirstStep: true };
-    if (step.minutes > FIRST_STEP_MAX && shrinkFirstStep) {
-      try {
-        const smaller = await shrinkFirstStep(step, maxMinutes);
-        if (isObject(smaller) && isNonEmptyString(smaller.title) && Number.isFinite(smaller.minutes) && smaller.minutes > 0) {
-          step = { ...step, title: smaller.title, minutes: Math.round(smaller.minutes) };
-        }
-      } catch {
-        // fall through to the clamp
-      }
+    if (t.minutes <= FIRST_STEP_MAX) {
+      out.push({ ...t, isFirstStep: true });
+      continue;
     }
-    out.push({ ...step, minutes: Math.min(step.minutes, FIRST_STEP_MAX) });
+    const startId = freshId(`${t.id}.0`, taken);
+    const tiny = await tryShrink(shrinkFirstStep, t, maxMinutes, goalById.get(t.goalId));
+    const start = tiny
+      ? { title: tiny.title, minutes: Math.min(tiny.minutes, FIRST_STEP_MAX) }
+      : { title: `${t.title} (first 10 minutes)`, minutes: FIRST_STEP_MAX };
+    const rest = tiny ? { title: t.title, minutes: t.minutes } : { title: `${t.title} (finish)`, minutes: t.minutes - FIRST_STEP_MAX };
+    out.push({ id: startId, goalId: t.goalId, ...start, dependsOn: [], isFirstStep: true });
+    out.push({ ...t, ...rest, dependsOn: [startId, ...t.dependsOn], isFirstStep: false });
   }
   return out;
+}
+
+async function tryShrink(shrinkFirstStep, task, maxMinutes, goal) {
+  if (!shrinkFirstStep) return null;
+  try {
+    const s = await shrinkFirstStep(task, maxMinutes, goal);
+    const ok = isObject(s) && isNonEmptyString(s.title) && Number.isFinite(s.minutes) && s.minutes > 0;
+    return ok ? { title: s.title, minutes: Math.round(s.minutes) } : null;
+  } catch {
+    return null;
+  }
 }
 
 // 4. Drop unknown and self references, then break cycles by removing the edge that closes each one.
@@ -263,9 +273,55 @@ export function cleanDependencies(tasks) {
   return tasks.map((t) => ({ ...t, dependsOn: deps.get(t.id) }));
 }
 
+// English titles only. Anything in Hindi script or with common Hinglish words goes back to the
+// model in one batch (up to 2 tries); a rewrite is kept only if it passes the same check.
+export async function enforceEnglish(plan, toEnglish) {
+  const key = (kind, x) => `${kind}:${x.id}`;
+  const fixed = new Map();
+  for (let attempt = 0; attempt < 2 && toEnglish; attempt++) {
+    const items = [
+      ...plan.goals.map((g) => ({ id: key('goal', g), title: g.title })),
+      ...plan.tasks.map((t) => ({ id: key('task', t), title: t.title })),
+    ].filter((i) => !fixed.has(i.id) && looksNonEnglish(i.title));
+    if (items.length === 0) break;
+    let rewritten;
+    try {
+      rewritten = await toEnglish(items);
+    } catch {
+      break;
+    }
+    for (const r of Array.isArray(rewritten) ? rewritten : []) {
+      if (isObject(r) && isNonEmptyString(r.title) && !looksNonEnglish(r.title)) fixed.set(r.id, r.title);
+    }
+  }
+  const apply = (kind) => (x) => (fixed.has(key(kind, x)) ? { ...x, title: fixed.get(key(kind, x)) } : x);
+  return { goals: plan.goals.map(apply('goal')), tasks: plan.tasks.map(apply('task')) };
+}
+
+// Romanized Hindi words that don't double as common English words ("do", "to", "par", "tab" left out).
+const HINGLISH = new Set(
+  ('hai hain tha thi karo karna karni karne karke kar ka ke ki ko mein pe aur se wala wale wali kya kaun kaunse ' +
+    'kab kal aaj abhi lena dena dekho kholo poocho pucho dhoondo dhundo likho rakho bhejo jaake jao nahi nahin bhi ' +
+    'toh yeh woh mera meri mere apna apni apne liye baad pehle saath kuch thoda jaldi ghar').split(' '),
+);
+
+export function looksNonEnglish(text) {
+  if (/[\u0900-\u097F]/.test(text)) return true; // Devanagari
+  return text
+    .toLowerCase()
+    .split(/[^a-z]+/)
+    .some((w) => HINGLISH.has(w));
+}
+
 // 5. Every task is at least 5 minutes.
 export function clampMinimum(tasks) {
   return tasks.map((t) => ({ ...t, minutes: Math.max(MIN_MINUTES, t.minutes) }));
+}
+
+function freshId(id, taken) {
+  while (taken.has(id)) id += '_';
+  taken.add(id);
+  return id;
 }
 
 function isObject(v) {

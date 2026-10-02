@@ -8,6 +8,8 @@ import {
   cleanDependencies,
   clampMinimum,
   hardSplit,
+  enforceEnglish,
+  looksNonEnglish,
   PlanError,
   FRIENDLY_ERROR,
 } from '../src/validate.js';
@@ -83,9 +85,10 @@ describe('parseWithRetry', () => {
     expect(request).toHaveBeenCalledTimes(2);
   });
 
-  it('treats a thrown request as a failed attempt', async () => {
-    const request = vi.fn().mockRejectedValueOnce(new Error('ECONNREFUSED')).mockResolvedValueOnce(good);
-    await expect(parseWithRetry(request)).resolves.toBeTruthy();
+  it('does not retry a request that throws, and passes the error through', async () => {
+    const request = vi.fn().mockRejectedValue(new Error('ECONNREFUSED'));
+    await expect(parseWithRetry(request)).rejects.toThrow('ECONNREFUSED');
+    expect(request).toHaveBeenCalledTimes(1);
   });
 });
 
@@ -106,7 +109,7 @@ describe('enforceSizeCap', () => {
     const r = await enforceSizeCap(tasks, 25, split);
 
     expect(split).toHaveBeenCalledTimes(1);
-    expect(split).toHaveBeenCalledWith(tasks[1], 25);
+    expect(split).toHaveBeenCalledWith(tasks[1], 25, undefined);
     expect(r.map((t) => t.id)).toEqual(['t1', 't2.1', 't2.2', 't3']);
     expect(deps(r)).toEqual({ t1: [], 't2.1': ['t1'], 't2.2': ['t2.1'], t3: ['t2.2'] });
     expect(r[1]).toMatchObject({ title: 'Outline methods', minutes: 20, goalId: 'g1' });
@@ -146,6 +149,13 @@ describe('enforceSizeCap', () => {
     }
   });
 
+  it('passes the goal to the model so it has context', async () => {
+    const split = vi.fn().mockResolvedValue([{ title: 'a', minutes: 20 }, { title: 'b', minutes: 20 }]);
+    const goals = [{ id: 'g1', title: 'Thesis', deadline: null }];
+    await enforceSizeCap([task('t1', 40)], 25, split, goals);
+    expect(split.mock.calls[0][2]).toBe(goals[0]);
+  });
+
   it('keeps isFirstStep on the first part only', async () => {
     const r = await enforceSizeCap([task('t1', 50, [], { isFirstStep: true })], 25);
     expect(r.map((t) => t.isFirstStep)).toEqual([true, false]);
@@ -181,20 +191,41 @@ describe('enforceFirstStep', () => {
     expect(r.filter((t) => t.isFirstStep).map((t) => t.id)).toEqual(['a', 'b']);
   });
 
-  it('asks the model for a smaller first step when it is over 10 min', async () => {
+  it('puts a tiny model-written step before an oversized first step, keeping the original', async () => {
     const shrink = vi.fn().mockResolvedValue({ title: 'Open the draft', minutes: 5 });
-    const r = await enforceFirstStep([task('t1', 25, [], { isFirstStep: true }), task('t2', 25, ['t1'])], shrink, 25);
+    const goals = [{ id: 'g1', title: 'Thesis', deadline: null }];
+    const r = await enforceFirstStep([task('t1', 25, [], { isFirstStep: true }), task('t2', 25, ['t1'])], shrink, 25, goals);
     expect(shrink).toHaveBeenCalledTimes(1);
-    expect(r[0]).toMatchObject({ id: 't1', title: 'Open the draft', minutes: 5, isFirstStep: true });
-    expect(r[1].minutes).toBe(25); // non-first tasks untouched
+    expect(shrink.mock.calls[0][2]).toBe(goals[0]);
+    expect(r.map((t) => [t.id, t.title, t.minutes, t.dependsOn, t.isFirstStep])).toEqual([
+      ['t1.0', 'Open the draft', 5, [], true],
+      ['t1', 'do t1', 25, ['t1.0'], false], // original work kept
+      ['t2', 'do t2', 25, ['t1'], false],
+    ]);
   });
 
-  it('clamps to 10 min when the model still returns something bigger, errors, or is absent', async () => {
+  it('caps a model-written first step that is still too big at 10 min', async () => {
     const tooBig = vi.fn().mockResolvedValue({ title: 'Bigger', minutes: 15 });
+    const r = await enforceFirstStep([task('t1', 25)], tooBig);
+    expect(r[0]).toMatchObject({ id: 't1.0', title: 'Bigger', minutes: 10, isFirstStep: true });
+    expect(r[1]).toMatchObject({ id: 't1', minutes: 25, dependsOn: ['t1.0'] });
+  });
+
+  it('splits off a 10-minute start when the model errors or is absent', async () => {
     const fails = vi.fn().mockRejectedValue(new Error('x'));
-    expect((await enforceFirstStep([task('t1', 25)], tooBig))[0]).toMatchObject({ title: 'Bigger', minutes: 10 });
-    expect((await enforceFirstStep([task('t1', 25)], fails))[0]).toMatchObject({ title: 'do t1', minutes: 10 });
-    expect((await enforceFirstStep([task('t1', 25)]))[0].minutes).toBe(10);
+    for (const shrink of [fails, undefined]) {
+      const r = await enforceFirstStep([task('t1', 25)], shrink);
+      expect(r.map((t) => [t.id, t.title, t.minutes, t.dependsOn, t.isFirstStep])).toEqual([
+        ['t1.0', 'do t1 (first 10 minutes)', 10, [], true],
+        ['t1', 'do t1 (finish)', 15, ['t1.0'], false],
+      ]);
+    }
+  });
+
+  it('keeps the original first step\'s dependencies on the original', async () => {
+    const r = await enforceFirstStep([task('t0', 5, [], { goalId: 'g0' }), task('t1', 25, ['t0'], { isFirstStep: true })]);
+    expect(r.find((t) => t.id === 't1.0').dependsOn).toEqual([]);
+    expect(r.find((t) => t.id === 't1').dependsOn).toEqual(['t1.0', 't0']);
   });
 
   it('does not ask when the first step is already small', async () => {
@@ -232,6 +263,68 @@ describe('cleanDependencies', () => {
   });
 });
 
+describe('looksNonEnglish', () => {
+  it.each([
+    'Electricity bill ka app kholo',
+    'Mummy ke liye doctor appointment',
+    'Gym jaake workout karo',
+    'बिजली का बिल भरो',
+    'Pay the bill aur receipt lo',
+  ])('flags %s', (title) => expect(looksNonEnglish(title)).toBe(true));
+
+  it.each([
+    'Pay the electricity bill and screenshot the receipt',
+    'Do the laundry and put it away',
+    'Open a new browser tab to check the bus timetable',
+    'Email the resume PDF to Priya',
+    "Ask Mom which doctor she wants to see",
+  ])('accepts %s', (title) => expect(looksNonEnglish(title)).toBe(false));
+});
+
+describe('enforceEnglish', () => {
+  const goals = [{ id: 'g1', title: 'Electricity bill pay karna', deadline: null }];
+  const tasks = [task('t1', 5, [], { title: 'Bill ka app kholo' }), task('t2', 5, [], { title: 'Check the amount' })];
+
+  it('sends only non-English titles, in one batch, and applies the rewrites', async () => {
+    const toEnglish = vi.fn().mockResolvedValue([
+      { id: 'goal:g1', title: 'Pay the electricity bill' },
+      { id: 'task:t1', title: 'Open the bill app' },
+    ]);
+    const r = await enforceEnglish({ goals, tasks }, toEnglish);
+    expect(toEnglish).toHaveBeenCalledTimes(1);
+    expect(toEnglish.mock.calls[0][0]).toEqual([
+      { id: 'goal:g1', title: 'Electricity bill pay karna' },
+      { id: 'task:t1', title: 'Bill ka app kholo' },
+    ]);
+    expect(r.goals[0].title).toBe('Pay the electricity bill');
+    expect(r.tasks.map((t) => t.title)).toEqual(['Open the bill app', 'Check the amount']);
+  });
+
+  it('retries once for rewrites that are still not English, then keeps the original', async () => {
+    const toEnglish = vi
+      .fn()
+      .mockResolvedValueOnce([{ id: 'goal:g1', title: 'Pay the bill' }, { id: 'task:t1', title: 'App kholo' }])
+      .mockResolvedValueOnce([{ id: 'task:t1', title: 'Still kholo' }]);
+    const r = await enforceEnglish({ goals, tasks }, toEnglish);
+    expect(toEnglish).toHaveBeenCalledTimes(2);
+    expect(toEnglish.mock.calls[1][0]).toEqual([{ id: 'task:t1', title: 'Bill ka app kholo' }]);
+    expect(r.goals[0].title).toBe('Pay the bill');
+    expect(r.tasks[0].title).toBe('Bill ka app kholo');
+  });
+
+  it('never calls the model when everything is English', async () => {
+    const toEnglish = vi.fn();
+    const plan = { goals: [{ id: 'g1', title: 'Resume', deadline: null }], tasks: [task('t1', 5)] };
+    expect(await enforceEnglish(plan, toEnglish)).toEqual(plan);
+    expect(toEnglish).not.toHaveBeenCalled();
+  });
+
+  it('keeps the plan when the model errors', async () => {
+    const r = await enforceEnglish({ goals, tasks }, vi.fn().mockRejectedValue(new Error('down')));
+    expect(r.tasks[0].title).toBe('Bill ka app kholo');
+  });
+});
+
 describe('clampMinimum', () => {
   it('raises tasks below 5 minutes to 5', () => {
     expect(clampMinimum([task('a', 2), task('b', 5), task('c', 30)]).map((t) => t.minutes)).toEqual([5, 5, 30]);
@@ -242,7 +335,7 @@ describe('validatePlan (end to end with fake model)', () => {
   it('runs every step and returns a plan the scheduler can use', async () => {
     const raw = plan([
       { id: 't1', goalId: 'g1', title: 'Write the full intro', minutes: 40, dependsOn: [], isFirstStep: true },
-      { id: 't2', goalId: 'g1', title: 'Email supervisor', minutes: 2, dependsOn: ['t1', 'ghost', 't3'] },
+      { id: 't2', goalId: 'g1', title: 'Supervisor ko email karo', minutes: 2, dependsOn: ['t1', 'ghost', 't3'] },
       { id: 't3', goalId: 'g1', title: 'Fix figures', minutes: 20, dependsOn: ['t2'] }, // cycle with t2
     ]);
     const request = vi.fn().mockResolvedValueOnce('oops').mockResolvedValueOnce(JSON.stringify(raw));
@@ -251,14 +344,16 @@ describe('validatePlan (end to end with fake model)', () => {
       { title: 'Write intro paragraph 2', minutes: 20 },
     ]);
     const shrinkFirstStep = vi.fn().mockResolvedValue({ title: 'Open the intro file', minutes: 3 });
+    const toEnglish = vi.fn().mockResolvedValue([{ id: 'task:t2', title: 'Email your supervisor' }]);
 
-    const r = await validatePlan(request, { maxMinutes: 25, splitTask, shrinkFirstStep });
+    const r = await validatePlan(request, { maxMinutes: 25, splitTask, shrinkFirstStep, toEnglish });
 
     expect(request).toHaveBeenCalledTimes(2);
     expect(r.tasks.map((t) => [t.id, t.title, t.minutes, t.dependsOn, t.isFirstStep])).toEqual([
-      ['t1.1', 'Open the intro file', 5, [], true], // split, shrunk, then raised to the 5 min floor
+      ['t1.1.0', 'Open the intro file', 5, [], true], // tiny start in front, raised to the 5 min floor
+      ['t1.1', 'Write intro paragraph 1', 20, ['t1.1.0'], false], // split part kept
       ['t1.2', 'Write intro paragraph 2', 20, ['t1.1'], false],
-      ['t2', 'Email supervisor', 5, ['t1.2', 't3'], false], // ghost dropped, rewired to last part
+      ['t2', 'Email your supervisor', 5, ['t1.2', 't3'], false], // ghost dropped, rewired, translated
       ['t3', 'Fix figures', 20, [], false], // t3 -> t2 closed the cycle, removed
     ]);
     expect(r.goals).toEqual([{ id: 'g1', title: 'Goal', deadline: '2026-10-09' }]);
