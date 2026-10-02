@@ -1,0 +1,57 @@
+# Builds each challenge app and publishes it to GitHub Pages under its own folder:
+#   https://meetpatel2209.github.io/HacktoberFest2026/DevChallenge1/
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'DevChallenge1/**'
+      - '.github/workflows/pages.yml'
+  workflow_dispatch: # allows a manual run from the Actions tab
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# One deploy at a time; don't cancel a deploy that's already publishing.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: DevChallenge1
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: DevChallenge1/package-lock.json
+
+      - run: npm ci
+      - run: npm test
+      - run: npm run build
+
+      - name: Put the build under /DevChallenge1/
+        run: mkdir -p ../_site && cp -r dist ../_site/DevChallenge1
+
+      - uses: actions/upload-pages-artifact@v4
+        with:
+          path: _site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}DevChallenge1/
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

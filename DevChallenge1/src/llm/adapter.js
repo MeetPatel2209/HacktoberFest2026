@@ -38,7 +38,7 @@ export function createOllamaAdapter({
       options: { temperature: 0 },
     };
     if (think !== undefined) body.think = think;
-    const data = await request(fetch, `${baseUrl}/api/chat`, timoeutMs, {
+    const data = await request(fetch, `${baseUrl}/api/chat`, timeoutMs, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body),
