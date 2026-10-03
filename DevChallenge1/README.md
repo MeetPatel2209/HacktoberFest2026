@@ -24,6 +24,7 @@ A private planner that runs an open-weight AI model **on your own computer**. Bu
 - [Known limits](#known-limits)
 - [What's next](#whats-next)
 - [Credits](#credits)
+- [License](#license)
 
 ---
 
@@ -366,3 +367,7 @@ Honest notes from testing with an 8B model:
 - **Font:** [Edu QLD Hand](https://fonts.google.com/specimen/Edu+QLD+Hand), © The QLD School Hand Australia Project Authors, SIL Open Font License 1.1, bundled via [Fontsource](https://fontsource.org).
 - **Tooling:** [Vite](https://vite.dev), [Vitest](https://vitest.dev), GitHub Actions and Pages.
 - **Research behind "concrete step at a set time":** implementation intentions, Gollwitzer & Sheeran (2006), a meta-analysis.
+
+## License
+
+The code is released under the [MIT License](../LICENSE): use it, change it, share it, with the copyright notice kept. The bundled Edu QLD Hand font keeps its own license (SIL Open Font License 1.1), and the Qwen3 model weights are Apache 2.0. Neither is covered by this project's license.
