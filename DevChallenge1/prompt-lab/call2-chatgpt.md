@@ -1,3 +1,7 @@
+# Call 2 design: ChatGPT's answer
+
+> ChatGPT's raw response to [`call2-meta-prompt.md`](call2-meta-prompt.md), kept unedited for comparison. Section 8 is missing because the test inputs were cut off when the brief was pasted. This design was **not** used: the project went with [`call2-claude.md`](call2-claude.md), later revised (see the status note there). One difference: this version mirrors the user's language, while the app always writes tasks in English.
+
 ## 1. CALL 2 SYSTEM PROMPT
 
 ```text

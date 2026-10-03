@@ -1,3 +1,5 @@
+> **The brief that was given to ChatGPT and Claude** to design the Call 2 prompt. Kept as sent. Later decisions differ: tasks are now always written in English (this brief asks to mirror the user's language), and the final prompt adds a calendar list and quoted-deadline evidence.
+
 You are helping me design the prompts and JSON schemas for one LLM call in a small web app. The output must work well with a LOCAL 7-8B instruct model (qwen3:8b with thinking off, or llama3.1:8b) running on Ollama at temperature 0. Design for a small model, not for yourself: short, explicit, example-driven.
 
 ## The app

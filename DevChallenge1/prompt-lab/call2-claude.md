@@ -2,7 +2,14 @@
 
 Written by Claude (Opus 5.5) in the Claude Code session that built `validate.js`, so it had more context than a fresh chat given only `call2-meta-prompt.md`.
 
-**Chosen design.** The code in `src/llm/prompts.js` and `src/llm/schemas.js` is now the source of truth; this file keeps the reasoning and sample outputs.
+> **Status: this is the first (v1) design, kept for the record.** Sections 1–8 below are the prompt *before* testing with real models. The prompt in use is in [`src/llm/prompts.js`](../src/llm/prompts.js) and [`src/llm/schemas.js`](../src/llm/schemas.js). Changes after testing (results in [`results/`](results/)):
+> - Goals gained `deadlineText` (the quoted words that state the deadline; code drops a deadline whose quote isn't in the brain-dump) and `estimatedMinutes` (the total size of the goal, written before its tasks).
+> - New rule: tasks must cover the whole goal. The vague-goal rule now takes priority over the estimate.
+> - Hindi date words added (aaj / kal / parso), plus clearer "next week" wording for the calendar list.
+> - The garage/guitar example was replaced by a larger essay/guitar example, so the model sees what covering a big goal looks like.
+> - Follow-up B got a worked example, and code rejects placeholder titles like "Tiny Step".
+> - Follow-up C (English rewrite) was added; section 5b describes it.
+> - The sample outputs in section 8 are *hand-written expectations*, not model output.
 
 ## 1. CALL 2 SYSTEM PROMPT
 

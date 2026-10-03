@@ -2,7 +2,7 @@
 
 **Type out everything on your plate. Get back tiny, concrete steps, scheduled into your free time, on a sticky note that shows only today.**
 
-A private planner that runs an open-weight AI model **on your own computer**. Built for the [DEV Hacktoberfest 2026 Weekend Challenge](https://dev.to) (theme: *Build for a Friend*), for one friend who gets overwhelmed when a big piece of work lands.
+A private planner that runs an open-weight AI model **on your own computer**. Built for the DEV Hacktoberfest 2026 Weekend Challenge (theme: *Build for a Friend*), for one friend who gets overwhelmed when a big piece of work lands.
 
 **Live app:** https://meetpatel2209.github.io/HacktoberFest2026/DevChallenge1/ (needs [Ollama](#setup) running on your machine, see below)
 
@@ -50,13 +50,13 @@ Every design choice in this app tries to **reduce decisions and shrink the visib
 
 1. **You write a brain-dump** of goals, deadlines and free time, e.g. *"Thesis chapter 3 due next Friday (intro + 3 sections + conclusion). Update my resume and email it to Priya by Wednesday. Weekday evenings work for me but not Thursday, and Saturday morning."*
 2. **The model reads your free time** (*weekday evenings → 18:00–21:00*) and **breaks each goal into concrete steps** (*"Write the introduction paragraph, about 250 words"*, not *"work on thesis"*).
-3. **Plain code checks and fixes the model's answer**: caps task size, makes first steps tiny, removes made-up deadlines, makes sure everything is in English.
+3. **Plain code checks and fixes the model's answer**: caps task size, makes first steps tiny, drops deadlines that aren't backed by your own words, makes sure everything is in English.
 4. **A deterministic scheduler** places the steps into your free time, respecting dependencies, deadlines, a 5-minute buffer and the daily cap.
 5. **You get yellow sticky notes**: Today by default, and a full plan with one note per day.
 
 ![Full plan: one sticky note per day, plus how the free time was read and the deadlines](docs/screenshots/full-plan.png)
 
-Everything is saved in your browser (`localStorage`). There are no accounts and no server. Dark mode follows your system.
+Everything is saved in your browser (`localStorage`). There are no accounts and no backend: GitHub Pages only serves the static files. Dark mode follows your system.
 
 <img src="docs/screenshots/today-dark-phone.png" alt="Today view in dark mode on a phone" width="300">
 
@@ -94,14 +94,19 @@ There are exactly **two main model calls**, each constrained by a JSON schema pa
 
 ### Call 1: free time (`src/llm/availability.js`)
 
-The model returns **weekly patterns**, not dates:
+The model returns **weekly patterns**, not dates. This is its real answer for the example brain-dump above:
 
 ```json
 {
-  "assumptions": ["'weekday evenings' read as 18:00-21:00"],
-  "windows": [{ "days": ["Mon", "Tue", "Wed", "Fri"], "date": null, "start": "18:00", "end": "21:00" }]
+  "assumptions": ["'weekday evenings' read as 18:00-21:00", "'Saturday morning' read as 09:00-12:00"],
+  "windows": [
+    { "days": ["Mon", "Tue", "Wed", "Thu", "Fri"], "date": null, "start": "18:00", "end": "21:00" },
+    { "days": ["Sat"], "date": null, "start": "09:00", "end": "12:00" }
+  ]
 }
 ```
+
+Note that it missed "but not Thursday". Exclusions are sometimes dropped (see [Known limits](#known-limits)).
 
 Code expands these into real dated windows for the next 7 days. The `assumptions` are shown under the plan, so a misread is easy to spot. If no free time is mentioned, the app plans 18:00–21:00 and says so.
 
@@ -147,7 +152,7 @@ The prompt *asks* for small tasks; the code *makes sure*:
 - A task that can't finish **before its goal's deadline**, or within the 7-day horizon, goes to *Didn't fit this week*.
 - **Done** tasks keep their slot. **Skip** re-plans every not-done task from now, and the skipped task can't land back in its old slot.
 - If you open the app after a slot you missed, it **re-plans on load**, quietly.
-- Real-minute arithmetic, so daylight-saving changes don't break anything.
+- Works in real elapsed minutes, so a free window across a daylight-saving change has its true length (tested on the October fall-back).
 
 ### Model adapter (`src/llm/adapter.js`)
 
@@ -175,14 +180,14 @@ Two 7–8B open-weight models were compared on the same five realistic brain-dum
 |---|---|---|
 | Cases that produced a plan | **5 / 5** | 4 / 5 |
 | Got stuck repeating itself | **0 times** | 3 times |
-| Deadlines exactly right | **4 / 5** | 3 / 5 |
+| Deadlines exactly right | **4 / 5** | 2 / 5 |
 | Task titles | Concrete ("Write 300 words for the first main point") | Often vague ("Start working on the DSA assignment") |
 | Splits big work | Yes | Weakly |
-| Time per plan (RTX 4060 laptop GPU) | 7–30 s | 10–29 s when it works, ~90 s per loop |
+| Time per plan (RTX 4060 laptop GPU) | 7–23 s | 10–29 s per answer, ~90 s per loop |
 
-Qwen3 8B (Apache 2.0) runs entirely on an 8 GB laptop GPU at about **39 tokens/second**, so a full plan takes **15–30 seconds**.
+Qwen3 8B (Apache 2.0) runs entirely on an 8 GB laptop GPU at about **39 tokens/second**. In the app, both calls together took **15–30 seconds** in testing.
 
-Every model reply, before and after the prompt changes, is saved in [`prompt-lab/results/`](prompt-lab/results/). The prompt design notes are in [`prompt-lab/call2-claude.md`](prompt-lab/call2-claude.md). A ChatGPT-generated alternative that was compared against it is in [`prompt-lab/call2-chatgpt.md`](prompt-lab/call2-chatgpt.md).
+Every model reply from the comparison is saved in [`prompt-lab/results/`](prompt-lab/results/): `qwen3-8b-v1/` is the first prompt version, `qwen3-8b/` and `llama3.1-8b/` the final one. The prompt design notes are in [`prompt-lab/call2-claude.md`](prompt-lab/call2-claude.md). A ChatGPT-generated alternative that was compared against it is in [`prompt-lab/call2-chatgpt.md`](prompt-lab/call2-chatgpt.md).
 
 To re-run the comparison yourself (Ollama must be running and the model pulled):
 
@@ -200,7 +205,7 @@ The runner prints each plan, flags vague titles, checks the deadlines, and repor
 | | Recommended | Minimum |
 |---|---|---|
 | GPU | NVIDIA with **8 GB VRAM** (e.g. RTX 4060), or Apple Silicon | none: runs on CPU, much slower |
-| RAM | 16 GB | 16 GB |
+| RAM | 16 GB | 8 GB |
 | Disk | ~8 GB free (Ollama ~2–4 GB + model 5.2 GB) | |
 | Browser | Chrome, Edge or Firefox | Safari may block a web page from reaching `localhost` |
 
@@ -256,7 +261,7 @@ Then quit and reopen the Ollama app.
 
 **Windows:** add a user environment variable `OLLAMA_ORIGINS` = `https://meetpatel2209.github.io`, then quit and reopen Ollama.
 
-Open **https://meetpatel2209.github.io/HacktoberFest2026/DevChallenge1/**. Chrome or Edge may ask once to *allow this site to access devices on your local network*. Click **Allow**: that's the page reaching your own Ollama.
+Open **https://meetpatel2209.github.io/HacktoberFest2026/DevChallenge1/**. Chrome or Edge may ask once to *allow this site to access devices on your local network*. If so, click **Allow**: that's the page reaching your own Ollama. (The hosted version hasn't been tested end to end in a browser yet; see [Known limits](#known-limits).)
 
 > **Why this is safe:** the setting only lets that one site use your local model. Any other website still gets `403 Forbidden`. You can check:
 > `curl -i -X OPTIONS localhost:11434/api/chat -H "Origin: https://example.com" -H "Access-Control-Request-Method: POST"`
@@ -284,7 +289,7 @@ npm run build      # static site in dist/
 ## Using it
 
 - **Say what the work actually is.** This is a small model on a laptop, not a giant cloud model. *"Write 3 sections of my thesis chapter by Friday"* works far better than *"get my life together"*. The app says this right under the text box.
-- **Mention deadlines and free time in your own words**: "by Monday", "kal tak", "free after 7 on weekdays", "Saturday morning". Hindi and Hinglish input are understood, and tasks always come back in English.
+- **Mention deadlines and free time in your own words**: "by Monday", "kal tak", "free after 7 on weekdays", "Saturday morning". Hinglish input worked in testing, and tasks always come back in English.
 - **Tough day?** Slide the task size down to 10–15 minutes.
 - **Done** ticks the next task. **Skip** moves it to later without fuss. **Undo** reverses a Done.
 - Check **"How I read your free time"** and **"Deadlines"** under the full plan. If something's misread, edit the text and press **New plan**.
@@ -340,12 +345,13 @@ Honest notes from testing with an 8B model:
 
 - **Vague goals give bloated plans.** "Get my life together" produces about 10 generic self-help steps. Prompt changes didn't reliably fix it (one made the model loop), so the UI asks for descriptive input instead.
 - **"Next Friday" means the Friday of next week** (Monday to Sunday weeks). On a Monday, "next Friday" is 11 days away, not 4. Check the Deadlines list.
+- **Exclusions in free time can be missed.** "Weekday evenings but not Thursday" sometimes still includes Thursday, and the assumptions list doesn't say so. Check the plan's days.
 - **Deadline quotes can be shared.** If one sentence holds two goals ("pay the bill and book the doctor by tomorrow"), both may get that deadline.
 - **Tasks are often exactly the slider value.** The model tends to fill the limit rather than estimate. Never over it, though.
 - **No recurring habits.** "Start a gym routine" becomes the first session, not a weekly repeat.
 - **Done early doesn't free the slot.** A task ticked before its time keeps its place in the plan.
 - **Times inside the repeated hour on the night the clocks go back** (02:00–03:00) are ambiguous when reloaded. This doesn't affect normal waking hours.
-- **Not tested on Safari**, which may block a website from reaching `localhost`.
+- **The hosted page + local Ollama path is untested in a real browser.** CORS was checked with `curl`, and the app was tested end to end on `localhost:5173`. Whether Chrome's local-network permission prompt appears, and how it behaves, still needs a real run. Safari may block a website from reaching `localhost` entirely.
 - **One browser, one device.** The plan lives in that browser's localStorage.
 
 ## What's next
@@ -356,7 +362,7 @@ Honest notes from testing with an 8B model:
 
 ## Credits
 
-- **Model:** [Qwen3 8B](https://ollama.com/library/qwen3) by the Qwen team (Apache 2.0), run with [Ollama](https://ollama.com) (MIT) and its llama.cpp engine.
+- **Model:** [Qwen3 8B](https://ollama.com/library/qwen3) by the Qwen team (Apache 2.0), run with [Ollama](https://ollama.com) (MIT).
 - **Font:** [Edu QLD Hand](https://fonts.google.com/specimen/Edu+QLD+Hand), © The QLD School Hand Australia Project Authors, SIL Open Font License 1.1, bundled via [Fontsource](https://fontsource.org).
 - **Tooling:** [Vite](https://vite.dev), [Vitest](https://vitest.dev), GitHub Actions and Pages.
 - **Research behind "concrete step at a set time":** implementation intentions, Gollwitzer & Sheeran (2006), a meta-analysis.

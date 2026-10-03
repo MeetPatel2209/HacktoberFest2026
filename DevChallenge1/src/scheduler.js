@@ -10,7 +10,7 @@
 //   bufferMinutes:    gap kept after every task (default 5)
 //   dailyCapMinutes:  max scheduled task minutes per local day (default 120)
 //   horizonDays:      plan through the end of today + N days (default 7)
-//   status:           { taskId: "done" | "skipped" } — anything but "done" is re-planned
+//   status:           { taskId: "done" } — done tasks are fixed; everything else is re-planned
 //   previous:         [{ taskId, start, end }] — earlier schedule; done tasks keep their slot
 //   notBefore:        { taskId: ISO } — earliest start for a task (a skipped task waits until
 //                     its old slot is over instead of landing right back at now)

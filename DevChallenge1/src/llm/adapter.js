@@ -9,7 +9,7 @@
 export const OLLAMA_URL = 'http://localhost:11434';
 // Chosen over llama3.1:8b on the manual test cases (prompt-lab/results/): concrete tasks, no loops.
 export const DEFAULT_MODEL = 'qwen3:8b';
-export const DEFAULT_TIMEOUT_MS = 120_000; // generous; on the friend's RTX 4060 a call should take seconds
+export const DEFAULT_TIMEOUT_MS = 120_000; // generous: on an RTX 4060 laptop GPU a plan call takes ~10-30 s
 // Context window (prompt + answer). Ollama's default 4096 is too tight for a 3-goal plan.
 export const DEFAULT_NUM_CTX = 8192;
 // Cap on answer length. Real plans are ~1000 tokens; a model stuck repeating itself is cut off here.

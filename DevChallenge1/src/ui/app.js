@@ -282,6 +282,7 @@ export function describeError(err, model) {
     }
     if (err.kind === 'model-missing') return { title: "The model isn't downloaded yet.", body: 'Run this once in a terminal:', code: `ollama pull ${model}` };
     if (err.kind === 'timeout') return { title: 'The model took too long.', body: 'Try again, or split the brain-dump into two smaller plans.' };
+    if (err.kind === 'http') return { title: 'Ollama returned an error.', body: err.message };
     return { title: 'The model gave an answer I could not use.', body: 'Try again; rewording a little often helps.' };
   }
   if (err instanceof PlanError) return { title: err.message };
