@@ -1,4 +1,4 @@
-# Goal-to-Plan · *one small step*
+# Planio · *Goal to Plan maker*
 
 **Type out everything on your plate. Get back tiny, concrete steps, scheduled into your free time, on a sticky note that shows only today.**
 
@@ -317,8 +317,7 @@ DevChallenge1/
 │       └── styles.css       # black / white / grey + yellow sticky notes, light & dark
 ├── tests/                   # Vitest unit tests
 ├── prompt-lab/              # model comparison: cases, runner, saved results, prompt design notes
-├── docs/screenshots/
-└── HANDOFF.md               # the original design brief
+└── docs/screenshots/
 ```
 
 Deployment: [`.github/workflows/pages.yml`](../.github/workflows/pages.yml) installs dependencies, runs the tests, builds, and publishes to GitHub Pages on every push to `main` that touches `DevChallenge1/`. A failing test blocks the deploy.

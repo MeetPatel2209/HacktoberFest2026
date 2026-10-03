@@ -1,4 +1,4 @@
-// Manual test cases from HANDOFF.md, pinned to one date so runs are comparable.
+// Manual test cases from the project's design brief, pinned to one date so runs are comparable.
 // expectDeadlines: goal deadlines a good answer should produce, in any goal order
 // (null = the person gave no deadline).
 

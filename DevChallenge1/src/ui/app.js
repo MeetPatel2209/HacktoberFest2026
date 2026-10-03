@@ -71,7 +71,7 @@ export function mountApp(root, { llm, storage = globalThis.localStorage, now = (
   function header() {
     const showNav = state && (ui.view === 'today' || ui.view === 'plan');
     return el('header', { class: 'header' },
-      el('h1', { class: 'brand' }, 'Goal-to-Plan', el('span', {}, 'one small step')),
+      el('h1', { class: 'brand' }, 'Planio', el('span', {}, 'Goal to Plan maker')),
       showNav &&
         el('nav', { class: 'nav', 'aria-label': 'Views' },
           tab('Today', 'today'),
