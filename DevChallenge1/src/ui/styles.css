@@ -1,0 +1,505 @@
+:root {
+  --bg: #ffffff;
+  --fg: #111111;
+  --muted: #6b6b6b;
+  --line: #d6d6d6;
+  --surface: #f4f4f4;
+  --note: #fff27a;
+  --note-ink: #1d1d1d;
+  --note-grey: #e8e8e8;
+  --note-shadow: rgba(0, 0, 0, 0.22);
+  --tape: rgba(255, 255, 255, 0.55);
+  --hand: 'Edu QLD Hand Variable', 'Segoe Print', 'Bradley Hand', cursive;
+  --sans: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #121212;
+    --fg: #f2f2f2;
+    --muted: #a3a3a3;
+    --line: #353535;
+    --surface: #1d1d1d;
+    --note: #ffe866;
+    --note-grey: #d4d4d4;
+    --note-shadow: rgba(0, 0, 0, 0.6);
+    --tape: rgba(255, 255, 255, 0.35);
+    color-scheme: dark;
+  }
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--sans);
+  font-size: 16px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+.app {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 28px 18px 64px;
+}
+
+button {
+  font: inherit;
+  cursor: pointer;
+}
+
+:focus-visible {
+  outline: 2px solid var(--fg);
+  outline-offset: 3px;
+}
+
+/* ---------- header ---------- */
+
+.header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 32px;
+}
+
+.brand {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.brand span {
+  font-family: var(--hand);
+  font-weight: 600;
+  font-size: 1.3rem;
+  margin-left: 6px;
+  color: var(--muted);
+}
+
+.nav {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.tab {
+  border: 1.5px solid transparent;
+  background: none;
+  color: var(--muted);
+  padding: 6px 12px;
+  border-radius: 999px;
+}
+
+.tab[aria-current='page'] {
+  border-color: var(--fg);
+  color: var(--fg);
+}
+
+/* ---------- buttons ---------- */
+
+.btn {
+  border: 1.5px solid var(--fg);
+  border-radius: 10px;
+  padding: 12px 20px;
+  font-weight: 600;
+  background: var(--fg);
+  color: var(--bg);
+  transition: transform 0.08s ease;
+}
+
+.btn:active {
+  transform: translateY(1px);
+}
+
+.btn:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.btn-outline {
+  background: transparent;
+  color: var(--fg);
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-weight: 500;
+}
+
+.link {
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--fg);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* ---------- input ---------- */
+
+.field-label {
+  display: block;
+  font-weight: 700;
+  font-size: 1.05rem;
+  margin-bottom: 10px;
+}
+
+.dump {
+  width: 100%;
+  min-height: 170px;
+  resize: vertical;
+  border: 1.5px solid var(--fg);
+  border-radius: 12px;
+  padding: 14px 16px;
+  background: var(--bg);
+  color: var(--fg);
+  font: inherit;
+  line-height: 1.55;
+}
+
+.dump::placeholder {
+  color: var(--muted);
+}
+
+.hint {
+  margin: 12px 0 0;
+  padding: 10px 14px;
+  border-left: 3px solid var(--fg);
+  background: var(--surface);
+  border-radius: 0 10px 10px 0;
+  font-size: 0.92rem;
+  color: var(--muted);
+}
+
+.hint strong {
+  color: var(--fg);
+}
+
+.hint em {
+  font-family: var(--hand);
+  font-style: normal;
+  font-size: 1.05rem;
+  color: var(--fg);
+}
+
+.size {
+  margin: 28px 0;
+}
+
+.size-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+}
+
+.size-value {
+  font-family: var(--hand);
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.slider {
+  width: 100%;
+  margin: 10px 0 4px;
+  accent-color: var(--fg);
+}
+
+.size-scale {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px;
+}
+
+.kbd {
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+/* ---------- sticky notes ---------- */
+
+.note {
+  --tilt: -1deg;
+  position: relative;
+  background: var(--note);
+  color: var(--note-ink);
+  font-family: var(--hand);
+  padding: 30px 24px 26px;
+  border-radius: 2px 2px 14px 2px;
+  box-shadow:
+    0 1px 1px rgba(0, 0, 0, 0.08),
+    0 14px 20px -12px var(--note-shadow);
+  transform: rotate(var(--tilt));
+}
+
+.note::before {
+  /* a strip of tape */
+  content: '';
+  position: absolute;
+  top: -11px;
+  left: 50%;
+  width: 92px;
+  height: 24px;
+  transform: translateX(-50%) rotate(-2deg);
+  background: var(--tape);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12);
+}
+
+.note.tilt-right {
+  --tilt: 1.2deg;
+}
+
+.note.grey {
+  background: var(--note-grey);
+}
+
+.note-title {
+  margin: 0 0 14px;
+  font-size: 1.7rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.note-sub {
+  margin: -8px 0 16px;
+  font-size: 1.1rem;
+  opacity: 0.7;
+}
+
+.note-empty {
+  font-size: 1.3rem;
+  margin: 0;
+}
+
+.points {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.point {
+  display: grid;
+  grid-template-columns: 1.4rem 1fr;
+  column-gap: 6px;
+  padding: 8px 0;
+  border-bottom: 1px dashed rgba(0, 0, 0, 0.18);
+}
+
+.point:last-child {
+  border-bottom: none;
+}
+
+.point::before {
+  content: '•';
+  font-size: 1.4rem;
+  line-height: 1.6rem;
+}
+
+.point-title {
+  font-size: 1.3rem;
+  font-weight: 500;
+  line-height: 1.35;
+}
+
+.point-meta {
+  grid-column: 2;
+  font-size: 1.02rem;
+  opacity: 0.68;
+}
+
+.point.done::before {
+  content: '✓';
+}
+
+.point.done .point-title {
+  text-decoration: line-through;
+  text-decoration-thickness: 2px;
+  opacity: 0.55;
+}
+
+.point.next::before {
+  content: '→';
+  font-weight: 700;
+}
+
+.point.next .point-title {
+  font-weight: 700;
+  background: linear-gradient(transparent 58%, rgba(0, 0, 0, 0.1) 58%);
+}
+
+.next-tag {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 0 8px;
+  border: 1.5px solid currentColor;
+  border-radius: 999px;
+  font-size: 0.95rem;
+  vertical-align: 2px;
+}
+
+.point-actions {
+  grid-column: 2;
+  display: flex;
+  gap: 10px;
+  margin-top: 6px;
+  font-family: var(--sans);
+}
+
+.mini {
+  border: 1.5px solid var(--note-ink);
+  border-radius: 999px;
+  padding: 2px 12px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  background: transparent;
+  color: var(--note-ink);
+}
+
+.mini.solid {
+  background: var(--note-ink);
+  color: var(--note);
+}
+
+.note-foot {
+  margin: 16px 0 0;
+  font-size: 1.1rem;
+  opacity: 0.75;
+}
+
+.below-note {
+  margin-top: 22px;
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+}
+
+.toast {
+  font-size: 0.92rem;
+  color: var(--muted);
+  min-height: 1.4em;
+}
+
+/* ---------- full plan ---------- */
+
+.board {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: 34px 26px;
+  padding-top: 12px;
+}
+
+.board .note-title {
+  font-size: 1.45rem;
+}
+
+.board .point-title {
+  font-size: 1.15rem;
+}
+
+.today-tag {
+  font-size: 1rem;
+  font-weight: 500;
+  margin-left: 6px;
+  opacity: 0.7;
+}
+
+.reading {
+  margin-top: 40px;
+  padding-top: 18px;
+  border-top: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
+.reading h2 {
+  margin: 0 0 6px;
+  font-size: 0.95rem;
+  color: var(--fg);
+}
+
+.reading ul {
+  margin: 0 0 14px;
+  padding-left: 18px;
+}
+
+/* ---------- states ---------- */
+
+.loading .note-title::after {
+  content: '';
+  animation: dots 1.4s steps(4, end) infinite;
+}
+
+@keyframes dots {
+  0% { content: ''; }
+  25% { content: '.'; }
+  50% { content: '..'; }
+  75% { content: '...'; }
+}
+
+.error {
+  margin-top: 22px;
+  border: 1.5px solid var(--fg);
+  border-radius: 12px;
+  padding: 14px 16px;
+  background: var(--surface);
+}
+
+.error p {
+  margin: 0 0 6px;
+}
+
+.error code {
+  display: inline-block;
+  margin-top: 4px;
+  padding: 2px 8px;
+  border-radius: 6px;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  font-size: 0.88rem;
+  overflow-wrap: anywhere;
+}
+
+.foot {
+  margin-top: 56px;
+  font-size: 0.82rem;
+  color: var(--muted);
+  text-align: center;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .note {
+    transform: none;
+  }
+  .loading .note-title::after {
+    animation: none;
+    content: '...';
+  }
+}
+
+@media (max-width: 480px) {
+  .note {
+    padding: 26px 18px 22px;
+  }
+  .note-title {
+    font-size: 1.5rem;
+  }
+}

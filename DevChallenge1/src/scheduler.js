@@ -12,6 +12,8 @@
 //   horizonDays:      plan through the end of today + N days (default 7)
 //   status:           { taskId: "done" | "skipped" } — anything but "done" is re-planned
 //   previous:         [{ taskId, start, end }] — earlier schedule; done tasks keep their slot
+//   notBefore:        { taskId: ISO } — earliest start for a task (a skipped task waits until
+//                     its old slot is over instead of landing right back at now)
 //
 // placements are { taskId, start, end } (local ISO, minute precision), sorted by start.
 // unscheduled lists task ids that could not be placed ("didn't fit this week").
@@ -73,6 +75,7 @@ export function schedule(tasks, freeWindows, now, options = {}) {
       continue;
     }
     let earliest = nowMs;
+    if (opts.notBefore?.[task.id]) earliest = Math.max(earliest, toMs(opts.notBefore[task.id]));
     for (const d of deps) {
       if (endById.has(d)) earliest = Math.max(earliest, endById.get(d));
     }

@@ -216,6 +216,16 @@ describe('schedule', () => {
       expect(r.unscheduled).toEqual([]);
     });
 
+    it('places a skipped task after its notBefore time and lets others use the gap', () => {
+      const t = [task('a', 25, 'g1'), task('b', 25, 'g2')];
+      const w = [win('2026-10-05T19:00', '2026-10-05T21:00')];
+      const r = schedule(t, w, '2026-10-05T19:00', { notBefore: { a: '2026-10-05T19:30' } });
+      expect(r.placements).toEqual([
+        { taskId: 'b', start: '2026-10-05T19:00', end: '2026-10-05T19:25' },
+        { taskId: 'a', start: '2026-10-05T19:30', end: '2026-10-05T19:55' },
+      ]);
+    });
+
     it('counts done minutes toward the daily cap', () => {
       const done = [{ taskId: 'd', start: '2026-10-05T19:00', end: '2026-10-05T20:40' }];
       const r = schedule([task('d', 100), task('x', 30, 'g2')], windows, '2026-10-05T20:40', {

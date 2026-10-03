@@ -13,5 +13,8 @@
   "devDependencies": {
     "vite": "^8.3.2",
     "vitest": "^5.0.3"
+  },
+  "dependencies": {
+    "@fontsource-variable/edu-qld-hand": "^5.3.0"
   }
 }

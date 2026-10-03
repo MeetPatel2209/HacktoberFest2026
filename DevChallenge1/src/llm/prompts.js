@@ -45,6 +45,37 @@ Reply: {"title":"Open the chapter 3 file and type the heading Introduction","min
 
 export const ENGLISH_SYSTEM = `You rewrite to-do items in plain English. Some are written in Hindi or Hinglish. Keep the meaning and every detail (names, amounts, places). Keep each one a short action that starts with a verb, except goal names, which stay short names. Return every id you are given, with its English title. Reply with JSON only.`;
 
+export const AVAILABILITY_SYSTEM = `You read when a person is free to work, from their brain-dump. Reply with JSON only, matching the schema.
+
+- Ignore goals, tasks and deadlines. Only read free time.
+- Free time is said in many ways: "I'm free", "available", "I can work", "evenings work for me", "weekday evenings work", "after college", "kal shaam free hoon". All of these are windows.
+- windows: one entry per block of free time.
+  - Time that repeats ("weekday evenings", "Saturday morning"): list the days in "days" and set "date" to null.
+  - A one-off ("free this Sunday afternoon"): copy the date from the CALENDAR into "date" and leave "days" empty.
+  - start and end are 24-hour times, "HH:MM". end is later than start.
+- Read loose words like this: morning 09:00-12:00, afternoon 13:00-17:00, evening or after work 18:00-21:00, night 20:00-23:00. "After 7" means 19:00-22:00. "Weekdays" are Mon-Fri, "weekends" are Sat and Sun. "Not Wednesday" removes Wed.
+- assumptions: one short English line for each loose phrase you turned into exact times, like "'evenings' read as 18:00-21:00". No assumptions for exact times.
+- If the person says nothing about free time, return empty windows and empty assumptions.
+
+EXAMPLE
+Brain-dump: "finish the report by friday. free after 7 on weekdays except wednesday, and saturday morning"
+Reply:
+{"assumptions":["'after 7' read as 19:00-22:00","'saturday morning' read as 09:00-12:00"],"windows":[{"days":["Mon","Tue","Thu","Fri"],"date":null,"start":"19:00","end":"22:00"},{"days":["Sat"],"date":null,"start":"09:00","end":"12:00"}]}
+
+EXAMPLE
+Brain-dump: "weekends work for me but not sunday evening. need to fix my bike"
+Reply:
+{"assumptions":["'weekends' read as 09:00-21:00","'not sunday evening' ends Sunday at 18:00"],"windows":[{"days":["Sat"],"date":null,"start":"09:00","end":"21:00"},{"days":["Sun"],"date":null,"start":"09:00","end":"18:00"}]}`;
+
+// Call 1.
+export function availabilityMessages({ brainDump, today }) {
+  const user = [`Today: ${weekdayOf(today)} ${today}`, '', 'CALENDAR', buildCalendar(today, 14), '', 'BRAIN-DUMP', brainDump.trim()];
+  return [
+    { role: 'system', content: AVAILABILITY_SYSTEM },
+    { role: 'user', content: user.join('\n') },
+  ];
+}
+
 // Call 2. `feedback` is the validation error from a failed first attempt, appended for the retry.
 export function planMessages({ brainDump, maxMinutes, today }, feedback = null) {
   const user = [

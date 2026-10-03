@@ -87,3 +87,29 @@ export const ENGLISH_SCHEMA = {
   required: ['titles'],
   additionalProperties: false,
 };
+
+// Call 1: free time. Weekly patterns ("Mon-Fri 19:00-22:00") rather than dated windows: easier for a
+// small model, and code expands them over the planning horizon. Assumptions come first so the model
+// writes how it reads a loose phrase before turning it into times.
+export const AVAILABILITY_SCHEMA = {
+  type: 'object',
+  properties: {
+    assumptions: { type: 'array', items: { type: 'string' } },
+    windows: {
+      type: 'array',
+      items: {
+        type: 'object',
+        properties: {
+          days: { type: 'array', items: { type: 'string', enum: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'] } },
+          date: { type: ['string', 'null'] },
+          start: { type: 'string' },
+          end: { type: 'string' },
+        },
+        required: ['days', 'date', 'start', 'end'],
+        additionalProperties: false,
+      },
+    },
+  },
+  required: ['assumptions', 'windows'],
+  additionalProperties: false,
+};
